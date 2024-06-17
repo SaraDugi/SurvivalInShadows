@@ -24,3 +24,5 @@ def bfs_with_safety_check(grid_map, start, goal):
             if 0 <= nx < rows and 0 <= ny < cols and grid_map[nx][ny]!= 0 and not visited[nx][ny]:  
                 queue.append(((nx, ny), path + [(nx, ny)]))
                 visited[nx][ny] = True
+
+    return None

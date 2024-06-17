@@ -66,3 +66,4 @@ def astar(maze, start, end):
             heappush(open_list, new_AStar)
 
     print(f"No path found after visiting {AStars_visited} AStars")
+    return None

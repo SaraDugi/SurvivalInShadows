@@ -150,3 +150,4 @@ class Enemy(Entity):
         self.actions(player)
         self.enemy_move(player) 
         self.animate()
+  

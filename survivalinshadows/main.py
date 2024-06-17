@@ -4,7 +4,6 @@ from level import Level
 from settings import *
 from player import *
 import os
-
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Survival in Shadows')
@@ -64,8 +63,13 @@ def load_game(mission_name):
                 sys.exit()
 
         level.run()  
+        '''path = level.enemy.enemy_move(level.player)  
+        if path is not None: 
+            print(path) '''
         pygame.display.flip() 
         clock.tick(60)
+
+    
 
 def main():
     running = True
@@ -100,3 +104,4 @@ def main():
     sys.exit()
 
 if __name__ == "__main__":
+    main()

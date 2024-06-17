@@ -39,6 +39,5 @@ def decision_tree_pathfinding(grid_map, start, goal):
                     stack.append(child_node)
 
     return None
-    print()
 
 path = decision_tree_pathfinding(grid_map, start_position, goal_position)

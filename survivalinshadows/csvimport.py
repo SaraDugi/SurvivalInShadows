@@ -26,3 +26,4 @@ def read_csv_file(file_path):
     with open(file_path, 'r') as file:
         reader = csv.reader(file)
         matrix = list(reader)
+    return matrix

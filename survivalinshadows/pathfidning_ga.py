@@ -6,7 +6,7 @@ maze = matrika
 maze_width = len(maze[0])
 maze_height = len(maze)
 
-def find_best_path(maze, start, end):
+def ga_pathfinding(maze, start, end):
     population_size = 100
     mutation_rate = 0.01
     crossover_rate = 0.8

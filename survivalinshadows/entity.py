@@ -1,12 +1,5 @@
 import pygame
-from settings import TILESIZE
-from csvimport import import_csv_layout
-from astar import astar
 from settings import *
-from geneticalgorithm import find_best_path
-from bfs import bfs_with_safety_check
-from decisiontrees import decision_tree_pathfinding
-from knearest import pathfinding 
 from level import *
 
 class Entity(pygame.sprite.Sprite):

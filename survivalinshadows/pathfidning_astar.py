@@ -16,7 +16,7 @@ class AStar:
     def __eq__(self, other):
         return self.position == other.position
 
-def astar(maze, start, end):
+def astar_pathfinding(maze, start, end):
     start_AStar = AStar(None, start)
     end_AStar = AStar(None, end)
     open_list = []  

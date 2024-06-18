@@ -23,10 +23,11 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 FONT_SIZE = 55
 GREEN = (0, 255, 0)
+RED = (255, 0, 0)
 
-MAIN_OPTIONS = ['Start Game', 'Exit Game']
+MAIN_OPTIONS = ['Start Game', 'Settings','Exit Game']
 MISSION_OPTIONS = ['Mission 1', 'Mission 2', 'Mission 3', 'Mission 4', 'Mission 5']
-
+PAUSE_OPTIONS = ['Resume', 'Restart game','Quit to start menu', 'Quit the game']
 
 monster_data =  {
     '1': {'speed':3, 'damage': 100, 'chase_radius': 5000, 'notice_radius': 100}

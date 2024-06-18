@@ -1,13 +1,17 @@
+import os
 import pygame
 import sys
 from level import Level
 from settings import *
 from player import *
-import os
+
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Survival in Shadows')
+pygame.font.init() 
 font = pygame.font.SysFont(None, FONT_SIZE)
+background = pygame.image.load(os.path.join('Graphics', 'Misc', 'menubackground-main.jpg'))
+background = pygame.transform.scale(background, (WIDTH, HEIGHT))
 
 class Menu:
     def __init__(self, title, options):
@@ -16,14 +20,14 @@ class Menu:
         self.selected_option = 0
 
     def render(self):
-        screen.fill(BLACK)
-        title_text = font.render(self.title, True, GREEN)
+        screen.blit(background, (0, 0))
+        title_text = font.render(self.title, True, WHITE)
         title_rect = title_text.get_rect(center=(WIDTH / 2, HEIGHT / 4))
         screen.blit(title_text, title_rect)
         
         for i, option in enumerate(self.options):
             if i == self.selected_option:
-                text = font.render(option, True, GREEN)
+                text = font.render(option, True, RED)
             else:
                 text = font.render(option, True, WHITE)
             text_rect = text.get_rect(center=(WIDTH / 2, HEIGHT / 2 + i * 60))
@@ -37,18 +41,44 @@ class Menu:
             elif event.key == pygame.K_DOWN and self.selected_option < len(self.options) - 1:
                 self.selected_option += 1
 
+class PauseMenu(Menu):
+    def __init__(self, title, options, mission_name):
+        super().__init__(title, options)
+        self.mission_name = mission_name
+
+    def handle_event(self, event, level):
+        screen.fill(BLACK)
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP and self.selected_option > 0:
+                self.selected_option -= 1
+            elif event.key == pygame.K_DOWN and self.selected_option < len(self.options) - 1:
+                self.selected_option += 1
+            elif event.key == pygame.K_RETURN:
+                if self.options[self.selected_option] == 'Resume':
+                    return False
+                elif self.options[self.selected_option] == 'Retry':
+                    load_game(self.mission_name)
+                elif self.options[self.selected_option] == 'Quit Game':
+                    pygame.quit()
+                    sys.exit()
+                elif self.options[self.selected_option] == 'Quit to Title':
+                    return 'main_menu'
+        return True
+
 def load_game(mission_name):
     level = Level(mission_name) 
     clock = pygame.time.Clock()
+    pause_menu = PauseMenu('Paused', ['Resume', 'Retry', 'Quit Game', 'Quit to Title'], mission_name)
+    paused = False
 
     if mission_name == 'Mission 1':
-            level.enemy.enemy_type = 'astar'
+            level.enemy.enemy_type = 'a*'
     elif mission_name == 'Mission 2':
             level.enemy.enemy_type = 'bfs'
     elif mission_name == 'Mission 3':
-            level.enemy.enemy_type = 'decisiontree'
+            level.enemy.enemy_type = 'dt'
     elif mission_name == 'Mission 4':
-            level.enemy.enemy_type = 'geneticalal'
+            level.enemy.enemy_type = 'ga'
     elif mission_name == 'Mission 5':
             level.enemy.enemy_type = 'knn'
 
@@ -61,16 +91,20 @@ def load_game(mission_name):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-
-        level.run()  
-        '''path = level.enemy.enemy_move(level.player)  
-        if path is not None: 
-            print(path) '''
-        pygame.display.flip() 
-        clock.tick(60)
-
-    
-
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    paused = not paused
+                if paused:
+                    paused = pause_menu.handle_event(event, level)
+        if paused:
+            if paused == 'main_menu':
+                return
+            pause_menu.render()
+        else:
+            level.run()  
+            pygame.display.flip() 
+            clock.tick(60)
+        
 def main():
     running = True
     start_menu = Menu("Survival in Shadows", MAIN_OPTIONS)

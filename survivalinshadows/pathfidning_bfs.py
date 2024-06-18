@@ -1,6 +1,6 @@
 from settings import *
 
-def bfs_with_safety_check(grid_map, start, goal):
+def bfs_pathfinding(grid_map, start, goal):
     rows, cols = len(grid_map), len(grid_map[0])
     visited = [[False]*cols for _ in range(rows)]
     

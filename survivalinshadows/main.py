@@ -9,15 +9,20 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption('Survival in Shadows')
 pygame.font.init() 
+pygame.mixer.init()
 font = pygame.font.SysFont(None, FONT_SIZE)
 background = pygame.image.load(os.path.join('Graphics', 'Misc', 'menubackground-main.jpg'))
 background = pygame.transform.scale(background, (WIDTH, HEIGHT))
+start_menu_music = pygame.mixer.Sound('Graphics/Audio/bg_audio/2. Moonless Night.wav')
+game_music = pygame.mixer.Sound('Graphics/Audio/bg_audio/6. Lurking in the Dark.wav')
 
 class Menu:
     def __init__(self, title, options):
         self.title = title
         self.options = options
         self.selected_option = 0
+        start_menu_music.play()
+        game_music.set_volume(0.8)
 
     def render(self):
         screen.blit(background, (0, 0))
@@ -70,6 +75,9 @@ def load_game(mission_name):
     clock = pygame.time.Clock()
     pause_menu = PauseMenu('Paused', ['Resume', 'Retry', 'Quit Game', 'Quit to Title'], mission_name)
     paused = False
+    start_menu_music.stop()
+    game_music.play()
+    game_music.set_volume(0.4)
 
     if mission_name == 'Mission 1':
             level.enemy.enemy_type = 'a*'

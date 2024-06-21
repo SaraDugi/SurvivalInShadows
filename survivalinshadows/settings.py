@@ -26,8 +26,9 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 
 MAIN_OPTIONS = ['Start Game', 'Settings','Exit Game']
-MISSION_OPTIONS = ['Mission 1', 'Mission 2', 'Mission 3', 'Mission 4', 'Mission 5']
-PAUSE_OPTIONS = ['Resume', 'Restart game','Quit to start menu', 'Quit the game']
+MISSION_OPTIONS = ['Mission 1', 'Mission 2', 'Mission 3', 'Mission 4', 'Mission 5', 'Back']
+PAUSE_OPTIONS = ['Resume', 'Restart game', 'Settings','Quit to start menu', 'Quit the game']
+SETTINGS_OPTIONS = ['Controls', 'Graphics','Sound', 'Back', 'Quit Game', 'Return to Desktop']
 
 monster_data =  {
     '1': {'speed':3, 'damage': 100, 'chase_radius': 5000, 'notice_radius': 100}

@@ -61,6 +61,8 @@ class PauseMenu(Menu):
             elif event.key == pygame.K_RETURN:
                 if self.options[self.selected_option] == 'Resume':
                     return False
+                if self.options[self.selected_option] == 'Settings':
+                    return False
                 elif self.options[self.selected_option] == 'Retry':
                     load_game(self.mission_name)
                 elif self.options[self.selected_option] == 'Quit Game':
@@ -68,6 +70,46 @@ class PauseMenu(Menu):
                     sys.exit()
                 elif self.options[self.selected_option] == 'Quit to Title':
                     return 'main_menu'
+        return True
+
+class SettingsMenu(Menu):
+    def __init__(self, title, options, mission_name):
+        super().__init__(title, options)
+        self.font = pygame.font.Font(None, 36)  # Choose your preferred font and size
+        self.color_selected = (255, 255, 255)  # White color for selected option
+        self.color_unselected = (100, 100, 100)  # Grey color for unselected options
+
+    def draw(self, screen):
+        for i, option in enumerate(self.options):
+            if i == self.selected_option:
+                color = self.color_selected
+            else:
+                color = self.color_unselected
+            text = self.font.render(option, True, color)
+            screen.blit(text, (50, 50 + i * 40)) 
+
+    def handle_event(self, event, level):
+        screen.fill(BLACK)
+        self.draw(screen)
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP and self.selected_option > 0:
+                self.selected_option -= 1
+            elif event.key == pygame.K_DOWN and self.selected_option < len(self.options) - 1:
+                self.selected_option += 1
+            elif event.key == pygame.K_RETURN:
+                if self.options[self.selected_option] == 'Controls':
+                    return 
+                elif self.options[self.selected_option] == 'Graphics':
+                    return
+                elif self.options[self.selected_option] == 'Sound':
+                    return
+                elif self.options[self.selected_option] == 'Back':
+                    return
+                elif self.options[self.selected_option] == 'Quit Game':
+                    return 'main_menu'
+                elif self.options[self.selected_option] == 'Return to Desktop':
+                    pygame.quit()
+                    sys.exit()
         return True
 
 def load_game(mission_name):
@@ -116,8 +158,10 @@ def load_game(mission_name):
 def main():
     running = True
     start_menu = Menu("Survival in Shadows", MAIN_OPTIONS)
+    settings_menu = Menu("Settings", SETTINGS_OPTIONS)
     mission_menu = Menu("Survival in Shadows", MISSION_OPTIONS)
     current_menu = start_menu
+    settings = settings_menu
 
     while running:
         for event in pygame.event.get():
@@ -128,6 +172,8 @@ def main():
                     if current_menu == start_menu:
                         if current_menu.selected_option == 0:
                             current_menu = mission_menu
+                        elif current_menu.selected_option == 1:
+                            current_menu = settings
                         else:
                             pygame.quit()
                             sys.exit()

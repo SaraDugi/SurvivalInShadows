@@ -19,6 +19,7 @@ class Level:
         self.player = Player((2450, 800),[self.visible_sprites],self.obstacle_sprites)
         self.enemy = Enemy(mission_name,'1',(1850, 800), [self.visible_sprites],self.obstacle_sprites)
         self.enemies = [self.enemy] 
+        self.death_counter = 0 
 
     def create_map(self,mission_name):
         layouts = {
@@ -55,6 +56,11 @@ class Level:
         button_font = pygame.font.Font(None, 50)
         button_width, button_height = 300, 50
 
+        death_counter_font = pygame.font.Font(None, 50)
+        death_counter_text = death_counter_font.render(f"Deaths: {self.death_counter}", True, (255, 255, 255))
+        death_counter_text_rect = death_counter_text.get_rect(center=(screen_width / 2, screen_height / 3))
+        display_surface.blit(death_counter_text, death_counter_text_rect)
+
         restart_button = pygame.Rect(screen_width / 2 - button_width / 2, screen_height / 2, button_width, button_height)
         pygame.draw.rect(display_surface, (255, 255, 255), restart_button)  
         restart_text = button_font.render("Restart", True, (0, 0, 0))  
@@ -66,7 +72,7 @@ class Level:
         quit_text = button_font.render("Quit", True, (0, 0, 0))  
         quit_text_rect = quit_text.get_rect(center=quit_button.center) 
         display_surface.blit(quit_text, quit_text_rect) 
-
+        
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -84,6 +90,12 @@ class Level:
                         pygame.quit()
                         sys.exit()
             pygame.display.flip()
+
+    def restart(self):
+        self.player.rect.topleft = (2450, 800)
+        self.enemy.rect.topleft = (1850, 800)
+        self.player.health = self.player.stats['health']
+        self.death_counter += 1
 
     def run(self):
         self.visible_sprites.custom_draw(self.player)

@@ -47,9 +47,10 @@ class Menu:
                 self.selected_option += 1
 
 class PauseMenu(Menu):
-    def __init__(self, title, options, mission_name):
+    def __init__(self, title, options, mission_name,level):
         super().__init__(title, options)
         self.mission_name = mission_name
+        self.level = level
 
     def handle_event(self, event, level):
         screen.fill(BLACK)
@@ -64,7 +65,7 @@ class PauseMenu(Menu):
                 if self.options[self.selected_option] == 'Settings':
                     return False
                 elif self.options[self.selected_option] == 'Retry':
-                    load_game(self.mission_name)
+                    level.restart()
                 elif self.options[self.selected_option] == 'Quit Game':
                     pygame.quit()
                     sys.exit()
@@ -75,9 +76,9 @@ class PauseMenu(Menu):
 class SettingsMenu(Menu):
     def __init__(self, title, options, mission_name):
         super().__init__(title, options)
-        self.font = pygame.font.Font(None, 36)  # Choose your preferred font and size
-        self.color_selected = (255, 255, 255)  # White color for selected option
-        self.color_unselected = (100, 100, 100)  # Grey color for unselected options
+        self.font = pygame.font.Font(None, 36) 
+        self.color_selected = (255, 255, 255)  
+        self.color_unselected = (100, 100, 100)
 
     def draw(self, screen):
         for i, option in enumerate(self.options):
@@ -115,7 +116,7 @@ class SettingsMenu(Menu):
 def load_game(mission_name):
     level = Level(mission_name) 
     clock = pygame.time.Clock()
-    pause_menu = PauseMenu('Paused', ['Resume', 'Retry', 'Quit Game', 'Quit to Title'], mission_name)
+    pause_menu = PauseMenu('Paused', ['Resume', 'Retry', 'Quit Game', 'Quit to Title'], mission_name, level)
     paused = False
     start_menu_music.stop()
     game_music.play()

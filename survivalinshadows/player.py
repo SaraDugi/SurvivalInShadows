@@ -1,3 +1,4 @@
+import math
 import pygame 
 from settings import *
 from csvimport import import_folder
@@ -13,9 +14,11 @@ class Player(Entity):
 		self.import_player_assets()
 		self.status = 'down'
 		self.obstacle_sprites = obstacle_sprites
-		self.stats = {'stamina':100, 'speed':2}
+		self.stats = {'health': 250, 'stamina':100, 'speed':2}
 		self.energy = self.stats['stamina']
 		self.speed = self.stats['speed']
+		self.health = self.stats['health']
+		self.health_bar = pygame.Rect(10, 40, self.health, 25) 
 		self.stamina_index = 0
 		self.stamina_bar = pygame.Rect(10, 10, self.energy, 25)
 		self.stamina_reduction = 10  
@@ -24,6 +27,8 @@ class Player(Entity):
 		self.speed_boost_active = False  
 		self.speed_boost_duration = 5000 
 		self.last_speed_boost = 0 
+		self.start_ticks = pygame.time.get_ticks()  
+		self.mood = 'normal'
 
 	def import_player_assets(self):
 		character_path = 'Graphics/Character_model/'
@@ -72,8 +77,33 @@ class Player(Entity):
 			if not 'idle' in self.status in self.status:
 				self.status = self.status + '_idle'
 
-	def draw_stamina_bar(self, screen):
-		pygame.draw.rect(screen, (255, 0, 0), self.stamina_bar)
+	def draw_stats(self, screen):
+		pygame.draw.rect(screen, (255, 0, 0), self.health_bar)  
+		pygame.draw.rect(screen, (0, 0, 255), self.stamina_bar)
+		colors = {'normal': (0, 255, 0), 'stressed': (255, 165, 0), 'critical': (255, 0, 0)}
+		color = colors[self.mood]
+		mood_text = pygame.font.SysFont(None, 36).render('Mood: ' + self.mood.capitalize(), True, color)
+		screen.blit(mood_text, (10, 130))
+    
+	def draw_timer(self, screen):
+		total_seconds = 600 - (pygame.time.get_ticks() - self.start_ticks) / 1000  
+		if total_seconds < 0:
+			total_seconds = 0
+		minutes = total_seconds // 60
+		seconds_in_minute = total_seconds % 60
+		milliseconds = (total_seconds % 1) * 1000
+		font = pygame.font.SysFont("monospace", 50, bold=True)
+		text = f"{int(minutes)}:{int(seconds_in_minute):02}:{int(milliseconds):03}"
+		
+		glow_surface = font.render(text, True, (255, 0, 0))
+		glow_rect = glow_surface.get_rect(center=(screen.get_width() // 2, 50))
+		for x in range(-3, 4):
+			for y in range(-3, 4):
+				screen.blit(glow_surface, glow_rect.move(x, y))
+		
+		text_surface = font.render(text, True, (255, 255, 255))
+		text_rect = text_surface.get_rect(center=(screen.get_width() // 2, 50))
+		screen.blit(text_surface, text_rect)
 
 	def animate(self):
 		animation = self.animations[self.status]
@@ -83,17 +113,27 @@ class Player(Entity):
 			self.frame_index = 0
 		self.image = animation[int(self.frame_index)]
 		self.rect = self.image.get_rect(center = self.hit_box.center)
-
+		
+	
+	def update_heartbeat(self):
+		if self.mood == 'normal':
+			self.heartbeat_value = 10
+		elif self.mood == 'stressed':
+			self.heartbeat_value = 20
+		else:  
+			self.heartbeat_value = 30
+		
 	def update(self):
 		self.input()
 		self.get_status()
 		self.animate()
 		self.move(self.speed)
-		self.draw_stamina_bar(pygame.display.get_surface()) 
+		self.health_bar.width = self.health
+		self.draw_stats(pygame.display.get_surface()) 
+		self.draw_timer(pygame.display.get_surface())
 
 		if self.speed_boost_active and pygame.time.get_ticks() - self.last_speed_boost <= self.speed_boost_duration:
 			self.move(self.speed * 2)  
 		else:
 			self.speed_boost_active = False  
 			self.move(self.speed)
-		self.draw_stamina_bar(pygame.display.get_surface())

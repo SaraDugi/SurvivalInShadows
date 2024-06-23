@@ -21,6 +21,7 @@ def astar_pathfinding(maze, start, end):
     end_AStar = AStar(None, end)
     open_list = []  
     heappush(open_list, start_AStar)
+    open_set = {start}
 
     closed_list = [[False for _ in range(len(maze[0]))] for _ in range(len(maze))]
 
@@ -32,6 +33,7 @@ def astar_pathfinding(maze, start, end):
         if AStars_visited == 1200:
             return
         current_AStar = heappop(open_list)
+        open_set.remove(current_AStar.position)
 
         if current_AStar == end_AStar:
             path = []
@@ -58,12 +60,11 @@ def astar_pathfinding(maze, start, end):
             new_AStar.h = abs(AStar_position[0] - end_AStar.position[0]) + abs(AStar_position[1] - end_AStar.position[1])
             new_AStar.f = new_AStar.g + new_AStar.h
 
-            for open_AStar in open_list:
-                if new_AStar == open_AStar and new_AStar.g > open_AStar.g:
-                    continue
-            if maze[new_AStar.position[0]][new_AStar.position[1]] == -1:
+            if new_AStar.position in open_set:
                 continue
+
             heappush(open_list, new_AStar)
+            open_set.add(new_AStar.position)
 
     print(f"No path found after visiting {AStars_visited} AStars")
     return None

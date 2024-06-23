@@ -1,31 +1,30 @@
 import numpy as np
+from collections import deque
 
-def k_nearest_neighbors(matrika, pos, k=3):
+def k_nearest_neighbors(matrika, pos, k):
     directions = [(0, -1), (-1, 0), (1, 0), (0, 1)]
-    distances = []
+    neighbors = []
     
     for dx, dy in directions:
         x, y = pos[0] + dx, pos[1] + dy
 
         if 0 <= x < len(matrika) and 0 <= y < len(matrika[0]):
-            distances.append((x, y))
+            neighbors.append((x, y))
     
-    distances.sort(key=lambda p: abs(p[0] - pos[0]) + abs(p[1] - pos[1]))
-    
-    return distances[:k]
+    return neighbors[:k]
 
 def knn_pathfinding(matrika, start, goal, k=3):
     visited = set()
-    queue = [(start, [start])]
+    queue = deque([(start, [start])])
     
     while queue:
-        (vertex, path) = queue.pop(0)
+        (vertex, path) = queue.popleft()
         
         if vertex == goal:
             return path
         
         if vertex not in visited:
-            for neighbor in k_nearest_neighbors(matrika, vertex, k=k):
+            for neighbor in k_nearest_neighbors(matrika, vertex, k):
                 new_path = list(path)
                 new_path.append(neighbor)
                 queue.append((neighbor, new_path))

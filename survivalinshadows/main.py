@@ -1,7 +1,7 @@
 import os
 import pygame
 import sys
-from level import Level
+from level import *
 from settings import *
 from player import *
 
@@ -89,7 +89,7 @@ class SettingsMenu(Menu):
             text = self.font.render(option, True, color)
             screen.blit(text, (50, 50 + i * 40)) 
 
-    def handle_event(self, event, level):
+    def handle_event(self, event):
         screen.fill(BLACK)
         self.draw(screen)
         if event.type == pygame.KEYDOWN:

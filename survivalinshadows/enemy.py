@@ -59,18 +59,16 @@ class Enemy(Entity):
         
         if self.enemy_type == 'a*':
             path = astar_pathfinding(maze, start, end)
-            if path is not None and len(path) > 1:
+            if path is not None and len(path) > 0:
                 next_step = list(path[1])
                 next_step[0] *= TILESIZE
                 next_step[1] *= TILESIZE
                 self.direction = pygame.math.Vector2(next_step[0] - self.rect.x, next_step[1] - self.rect.y)
                 self.move(3)  
-            else:
-                self.direction = pygame.math.Vector2()
         if self.enemy_type == 'ga':
             path = ga_pathfinding(maze, start, end)
-            if path is not None and len(path) > 0:
-                next_step = list(path[0])
+            if path is not None and len(path) > 1:
+                next_step = list(path[1])
                 next_step[0] *= TILESIZE
                 next_step[1] *= TILESIZE
                 self.direction = pygame.math.Vector2(next_step[0]  - self.rect.centerx, next_step[1] - self.rect.centery)
@@ -79,8 +77,8 @@ class Enemy(Entity):
                 self.direction = pygame.math.Vector2()
         if self.enemy_type == 'bfs':
             path = bfs_pathfinding(maze, start, end)
-            if path is not None and len(path) > 0:
-                next_step = list(path[0])
+            if path is not None and len(path) > 1:
+                next_step = list(path[1])
                 next_step[0] *= TILESIZE
                 next_step[1] *= TILESIZE
                 self.direction = pygame.math.Vector2(next_step[0] - self.rect.x, next_step[1] - self.rect.y)
@@ -89,8 +87,8 @@ class Enemy(Entity):
                 self.direction = pygame.math.Vector2()
         if self.enemy_type == 'dt':
             path = decisiontree_pathfinding(maze, start, end)
-            if path is not None and len(path) > 0:
-                next_step = list(path[0])
+            if path is not None and len(path) > 1:
+                next_step = list(path[1])
                 next_step[0] *= TILESIZE
                 next_step[1] *= TILESIZE
                 self.direction = pygame.math.Vector2(next_step[0] - self.rect.x, next_step[1] - self.rect.y)
@@ -99,8 +97,8 @@ class Enemy(Entity):
                 self.direction = pygame.math.Vector2()
         if self.enemy_type == 'knn':
             path = knn_pathfinding(maze, start, end, k=3)
-            if path is not None and len(path) > 0:
-                next_step = list(path[0])
+            if path is not None and len(path) > 1:
+                next_step = list(path[1])
                 next_step[0] *= TILESIZE
                 next_step[1] *= TILESIZE
                 self.direction = pygame.math.Vector2(next_step[0] - self.rect.x, next_step[1] - self.rect.y)

@@ -21,9 +21,9 @@ def decisiontree_pathfinding(matrika, start, goal):
             visited.add((x, y))
             for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
                 nx, ny = x + dx, y + dy
-                if 0 <= nx < len(matrika) and 0 <= ny < len(matrika[0]) and matrika[nx][ny] != 0 and (nx, ny) not in visited:  
-                    child_node = Node((nx, ny), parent=current_node)
-                    current_node.add_child(child_node)
-                    stack.append(child_node)
+                if 0 <= nx < len(matrika) and 0 <= ny < len(matrika[0]) and matrika[nx][ny] != 0:  
+                    if (nx, ny) not in visited:
+                        child_node = Node((nx, ny), parent=current_node)
+                        stack.append(child_node)
 
     return None

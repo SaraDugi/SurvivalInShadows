@@ -1,12 +1,10 @@
 import sys
 import pygame
-from settings import TILESIZE
+from settings import *
 from csvimport import import_csv_layout
 from enemy import Enemy
-from tiledmap import TiledMap
 from tile import Tile
 from player import Player
-from ui import *
 
 class Level:
     def __init__(self, mission_name):
@@ -15,9 +13,8 @@ class Level:
         self.obstacle_sprites = pygame.sprite.Group()
         self.mission_name = mission_name
         self.create_map(mission_name)
-        self.ui = UI()
-        self.player = Player((2450, 800),[self.visible_sprites],self.obstacle_sprites)
-        self.enemy = Enemy(mission_name,'1',(1850, 800), [self.visible_sprites],self.obstacle_sprites)
+        self.player = Player(PLAYER_START_POS,[self.visible_sprites],self.obstacle_sprites)
+        self.enemy = Enemy(mission_name,'1',ENEMY_START_POS, [self.visible_sprites],self.obstacle_sprites)
         self.enemies = [self.enemy] 
         self.death_counter = 0 
 
@@ -101,7 +98,6 @@ class Level:
         self.visible_sprites.custom_draw(self.player)
         self.visible_sprites.update()
         self.visible_sprites.enemy_update(self.player)
-        self.ui.display(self.player)
 
         for enemy in self.enemies:
             if pygame.sprite.collide_rect(self.player, enemy):

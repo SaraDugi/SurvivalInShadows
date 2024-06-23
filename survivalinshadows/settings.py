@@ -12,6 +12,9 @@ UI_FONT = '../graphics/font/joystix.ttf'
 UI_FONT_SIZE = 18
 LIGHT_RADIUS = 192
 
+PLAYER_START_POS = (2450, 800)
+ENEMY_START_POS = (1850, 800)
+
 WATER_COLOR = '#71ddee'
 UI_BG_COLOR = '#000000'
 UI_BORDER_COLOR = '#111111'
@@ -24,6 +27,10 @@ WHITE = (255, 255, 255)
 FONT_SIZE = 55
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
+
+STAMINA_REDUCTION = 10  
+STAMINA_COOLDOWN = 1000  
+SPEED_BOOST_DURATION = 5000
 
 MAIN_OPTIONS = ['Start Game', 'Settings','Exit Game']
 MISSION_OPTIONS = ['Mission 1', 'Mission 2', 'Mission 3', 'Mission 4', 'Mission 5', 'Back']

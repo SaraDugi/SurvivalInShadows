@@ -123,15 +123,15 @@ def load_game(mission_name):
     game_music.set_volume(0.4)
 
     if mission_name == 'Mission 1':
-            level.enemy.enemy_type = 'a*'
+            level.enemy.enemy_type = 'd'
     elif mission_name == 'Mission 2':
-            level.enemy.enemy_type = 'bfs'
+            level.enemy.enemy_type = ''
     elif mission_name == 'Mission 3':
-            level.enemy.enemy_type = 'dt'
+            level.enemy.enemy_type = ''
     elif mission_name == 'Mission 4':
-            level.enemy.enemy_type = 'ga'
+            level.enemy.enemy_type = ''
     elif mission_name == 'Mission 5':
-            level.enemy.enemy_type = 'knn'
+            level.enemy.enemy_type = ''
 
     print(f"Selected mission: {mission_name}")
     print(f"Enemy type: {level.enemy.enemy_type}")

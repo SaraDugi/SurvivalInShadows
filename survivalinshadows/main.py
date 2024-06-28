@@ -51,6 +51,7 @@ class PauseMenu(Menu):
         super().__init__(title, options)
         self.mission_name = mission_name
         self.level = level
+        self.amount_paused = 0
 
     def handle_event(self, event, level):
         screen.fill(BLACK)
@@ -71,6 +72,7 @@ class PauseMenu(Menu):
                     sys.exit()
                 elif self.options[self.selected_option] == 'Quit to Title':
                     return 'main_menu'
+        self.level.paused_times += 1
         return True
 
 class SettingsMenu(Menu):

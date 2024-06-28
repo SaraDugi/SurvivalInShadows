@@ -3,6 +3,9 @@ import pygame
 from settings import *
 from csvimport import import_csv_layout
 from enemy import Enemy
+from game_stats import GameStats
+from camera import YSortCameraGroup
+from main import PauseMenu
 from tile import Tile
 from player import Player
 
@@ -17,6 +20,8 @@ class Level:
         self.enemy = Enemy(mission_name,'1',ENEMY_START_POS, [self.visible_sprites],self.obstacle_sprites)
         self.enemies = [self.enemy] 
         self.death_counter = 0 
+        self.stats = GameStats()
+        self.paused_times = 0
 
     def create_map(self,mission_name):
         layouts = {
@@ -40,23 +45,51 @@ class Level:
                             if col == '0':
                                 self.enemy = Enemy(mission_name,'1',(x, y), [self.visible_sprites], self.obstacle_sprites)
 
+    def stats_screen(self, display_surface):
+        screen_width, screen_height = 800, 600
+        display_surface.fill((50, 50, 50))  
+
+        stats_font = pygame.font.Font(None, 50)
+
+        stats = [
+            f"Pathfinding: {self.stats.pathfinding}",
+            f"Time played: {self.stats.time_played}",
+            f"Died: {self.stats.died}",
+            f"Won: {self.stats.won}",
+            f"Retry: {self.stats.retry}",
+            f"Amount paused: {self.stats.amount_paused}",
+            f"Wall bumps: {self.stats.wall_bumps}",
+            f"Encounters: {self.stats.encounters}",
+            f"Chases escaped: {self.stats.chases_escaped}",
+            f"Chase times: {self.stats.chase_times}",
+            f"Average proximity: {self.stats.avg_prox}"
+        ]
+        start_y = (screen_height - (len(stats) * 50)) / 2
+
+        for i, stat in enumerate(stats):
+            stats_text = stats_font.render(stat, True, (255, 255, 255))
+            stats_text_rect = stats_text.get_rect(center=(screen_width / 2, start_y + i * 50))
+            display_surface.blit(stats_text, stats_text_rect)
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN: 
+                        self.game_over_screen(display_surface)
+                        break
+            pygame.display.flip()
+
+
     def game_over_screen(self, display_surface):
         screen_width, screen_height = 800, 600
 
         display_surface.fill(BLACK)
 
-        game_over_font = pygame.font.Font(None, 100)
-        game_over_text = game_over_font.render("Game Over", True, (255, 255, 255))
-        game_over_text_rect = game_over_text.get_rect(center=(screen_width / 2, screen_height / 4))
-        display_surface.blit(game_over_text, game_over_text_rect)
-
         button_font = pygame.font.Font(None, 50)
         button_width, button_height = 300, 50
-
-        death_counter_font = pygame.font.Font(None, 50)
-        death_counter_text = death_counter_font.render(f"Deaths: {self.death_counter}", True, (255, 255, 255))
-        death_counter_text_rect = death_counter_text.get_rect(center=(screen_width / 2, screen_height / 3))
-        display_surface.blit(death_counter_text, death_counter_text_rect)
 
         restart_button = pygame.Rect(screen_width / 2 - button_width / 2, screen_height / 2, button_width, button_height)
         pygame.draw.rect(display_surface, (255, 255, 255), restart_button)  
@@ -68,8 +101,8 @@ class Level:
         pygame.draw.rect(display_surface, (255, 255, 255), quit_button)  
         quit_text = button_font.render("Quit", True, (0, 0, 0))  
         quit_text_rect = quit_text.get_rect(center=quit_button.center) 
-        display_surface.blit(quit_text, quit_text_rect) 
-        
+        display_surface.blit(quit_text, quit_text_rect)
+
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -101,34 +134,39 @@ class Level:
 
         for enemy in self.enemies:
             if pygame.sprite.collide_rect(self.player, enemy):
-                self.game_over_screen(self.display_surface)
+                self.stats.pathfinding =  self.enemy.enemy_type 
+                self.stats.died = True 
+                self.stats.retry = False 
+                self.stats.won = False 
+                self.stats.time_played = self.player.get_time_played()
+                self.stats.amount_paused = self.paused_times
+
+                self.stats_screen(self.display_surface)
                 return
 
-class YSortCameraGroup(pygame.sprite.Group):
-    def __init__(self):
-        super().__init__()
-        self.display_surface = pygame.display.get_surface()
-        self.half_width = self.display_surface.get_size()[0] // 2
-        self.half_height = self.display_surface.get_size()[1] // 2
-        self.offset = pygame.math.Vector2()
+    def player_died(self):
+        self.stats.died = True
 
-        self.floor = pygame.image.load("Graphics/Map/map/abandonefactory.png").convert()
-        self.floor_rect = self.floor.get_rect(topleft=(0, 0))
+    def player_won(self):
+        self.stats.won = True
 
-    def custom_draw(self, player):
-        self.offset.x = player.rect.centerx - self.half_width
-        self.offset.y = player.rect.centery - self.half_height
+    def player_retry(self):
+        self.stats.retry = True
 
-        floor_pos = self.floor_rect.topleft - self.offset
-        self.display_surface.blit(self.floor, floor_pos)
+    def pause_game(self):
+        self.stats.amount_paused += 1
 
-        for sprite in sorted(self.sprites(), key=lambda sprite: sprite.rect.centery):
-            offset_pos = sprite.rect.topleft - self.offset
-            if sprite == player:
-                offset_pos = (self.half_width - player.rect.width // 2, self.half_height - player.rect.height // 2)
-            self.display_surface.blit(sprite.image, offset_pos)
+    def bump_wall(self):
+        self.stats.wall_bumps += 1
 
-    def enemy_update(self,player):
-        enemy_sprites = [sprite for sprite in self.sprites() if hasattr(sprite,'sprite_type') and sprite.sprite_type == 'enemy']
-        for enemy in enemy_sprites:
-            enemy.enemy_update(player)
+    def encounter_enemy(self):
+        self.stats.encounters += 1
+
+    def escape_chase(self):
+        self.stats.chases_escaped += 1
+
+    def chase_time(self):
+        self.stats.chase_times += 1
+
+    def update_avg_prox(self, prox):
+        self.stats.avg_prox = (self.stats.avg_prox * self.stats.encounters + prox) / (self.stats.encounters + 1)

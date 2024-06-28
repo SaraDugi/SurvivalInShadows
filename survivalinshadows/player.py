@@ -1,3 +1,4 @@
+import datetime
 import math
 import pygame 
 from settings import *
@@ -107,6 +108,11 @@ class Player(Entity):
 		text_surface = font.render(text, True, (255, 255, 255))
 		text_rect = text_surface.get_rect(center=(screen.get_width() // 2, 50))
 		screen.blit(text_surface, text_rect)
+	
+	def get_time_played(self):
+		total_seconds = (pygame.time.get_ticks() - self.start_ticks) / 1000
+		time_played = str(datetime.timedelta(seconds=int(total_seconds)))
+		return time_played
 
 	def animate(self):
 		animation = self.animations[self.status]

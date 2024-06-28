@@ -50,7 +50,7 @@ class Enemy(Entity):
         end = (int(player.rect.centerx//TILESIZE), int(player.rect.centery//TILESIZE))
         
         if self.enemy_type == 'a*':
-            path = astar_pathfinding(maze, start, end)
+            path = astar_pathfinding(maze, start, end)            
             if path is not None and len(path) > 0:
                 next_step = list(path[1])
                 next_step[0] *= TILESIZE

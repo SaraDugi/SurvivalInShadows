@@ -12,6 +12,7 @@ class Entity(pygame.sprite.Sprite):
     def move(self, speed):
         if self.direction.magnitude() != 0:
             self.direction = self.direction.normalize()
+            print(self.direction, self.hit_box)
             self.hit_box.x += self.direction.x * speed
             self.collision('horizontal')
             self.hit_box.y += self.direction.y * speed
@@ -22,6 +23,7 @@ class Entity(pygame.sprite.Sprite):
         if direction == 'horizontal':
             for sprite in self.obstacle_sprites:
                 if sprite.hit_box.colliderect(self.hit_box):
+                    print(self.hit_box, sprite.hit_box)
                     if self.direction.x > 0:
                         self.hit_box.right = sprite.hit_box.left
                     if self.direction.x < 0: 
@@ -30,6 +32,7 @@ class Entity(pygame.sprite.Sprite):
         if direction == 'vertical':
             for sprite in self.obstacle_sprites:
                 if sprite.hit_box.colliderect(self.hit_box):
+                    print(self.hit_box, sprite.hit_box, "tmp")
                     if self.direction.y > 0:
                         self.hit_box.bottom = sprite.hit_box.top
                     if self.direction.y < 0: 

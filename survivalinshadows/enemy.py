@@ -7,6 +7,7 @@ from pathfidning_bfs import bfs_pathfinding
 from pathfidning_decisiontrees import decision_tree_pathfinding
 from pathfidning_knn import knn_pathfinding
 from pathfinding_dijsktra import dijkstra_pathfinding
+import sys
 
 class Enemy(Entity):
     def __init__(self,enemy_type,name, pos, groups, obstacle_sprites):
@@ -20,7 +21,7 @@ class Enemy(Entity):
         self.rect = self.image.get_rect(topleft = pos)
 
         self.rect = self.image.get_rect(topleft = pos)
-        self.hit_box = self.rect.inflate(0,-10)
+        self.hit_box = self.rect.inflate(0, 0)
         self.obstacle_sprites = obstacle_sprites
         self.frame_index = 0 
             
@@ -30,6 +31,7 @@ class Enemy(Entity):
         self.attack_damage = monster_info['damage']
         self.chase_radius = monster_info['chase_radius']
         self.notice_radius = monster_info['notice_radius']
+        self.next = None
 
     def import_graphics(self,name):
         self.animations = {'walk' : [], 'chase': []}
@@ -46,17 +48,23 @@ class Enemy(Entity):
 
     def enemy_move(self, player):
         maze = read_csv_file('Graphics/Map/CSV/abandonefactory_limit.csv')  
-        start = (int(self.rect.centerx//TILESIZE), int(self.rect.centery//TILESIZE))
-        end = (int(player.rect.centerx//TILESIZE), int(player.rect.centery//TILESIZE))
-        
+        start = (int(self.rect.x//TILESIZE), int(self.rect.y//TILESIZE))
+        end = (int(player.rect.x//TILESIZE), int(player.rect.y//TILESIZE))
+        print(self.rect)
+        print(self.direction, "test0")
         if self.enemy_type == 'a*':
-            path = astar_pathfinding(maze, start, end)            
-            if path is not None and len(path) > 0:
-                next_step = list(path[1])
-                next_step[0] *= TILESIZE
-                next_step[1] *= TILESIZE
-                self.direction = pygame.math.Vector2(next_step[0] - self.rect.x, next_step[1] - self.rect.y)
-                self.move(3)  
+            if self.rect.x % TILESIZE != 0 or self.rect.y % TILESIZE != 0:
+                None
+            else:
+                path = astar_pathfinding(maze, start, end)
+                if path is not None and len(path) > 0:
+                    next_step = list(path[1])
+                    next_step[0] *= TILESIZE
+                    next_step[1] *= TILESIZE
+                    self.direction = pygame.math.Vector2(next_step[0] - self.rect.x, next_step[1] - self.rect.y)
+            print(self.direction, "test")
+            self.move(3) 
+            print(self.direction, "test1")
         if self.enemy_type == 'bfs':
             path = bfs_pathfinding(maze, start, end)
             if path is not None and len(path) > 0:
@@ -121,6 +129,5 @@ class Enemy(Entity):
 
     def enemy_update(self,player):
         self.get_status(player)
-        self.actions(player)
         self.enemy_move(player) 
         self.animate()

@@ -1,6 +1,5 @@
 import pygame
 
-
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self):
         super().__init__()

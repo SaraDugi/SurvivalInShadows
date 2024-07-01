@@ -1,6 +1,3 @@
-import pygame
-
-
 WIDTH = 1080
 HEIGHT = 700
 FPS = 60
@@ -15,8 +12,8 @@ UI_FONT = '../graphics/font/joystix.ttf'
 UI_FONT_SIZE = 18
 LIGHT_RADIUS = 192
 
-PLAYER_START_POS = (2450, 800)
-ENEMY_START_POS = (1850, 800)
+PLAYER_START_POS = (2448, 816)
+ENEMY_START_POS = (1872, 816)
 
 WATER_COLOR = '#71ddee'
 UI_BG_COLOR = '#000000'
@@ -32,14 +29,13 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 
 STAMINA_REDUCTION = 10  
-STAMINA_COOLDOWN = 1000  
+STAMINA_COOLDOWN = 1500  
 SPEED_BOOST_DURATION = 5000
 
 MAIN_OPTIONS = ['Start Game', 'Settings','Exit Game']
 MISSION_OPTIONS = ['Mission 1', 'Mission 2', 'Mission 3', 'Mission 4', 'Mission 5', 'Back']
-PAUSE_OPTIONS = ['Resume', 'Restart game', 'Settings','Quit to start menu', 'Quit the game']
-SETTINGS_OPTIONS = ['Controls', 'Graphics','Sound', 'Back', 'Quit Game', 'Return to Desktop']
+PAUSE_OPTIONS = ['Resume','Quit to start menu', 'Quit the game']
 
 monster_data =  {
-    '1': {'speed':3, 'damage': 100, 'chase_radius': 5000, 'notice_radius': 100}
+    '1': {'speed':3, 'damage': 100, 'chase_radius': 1000, 'notice_radius': 5000}
 }

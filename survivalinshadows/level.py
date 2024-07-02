@@ -1,12 +1,14 @@
 import datetime
+import math
 import sys
+from tkinter import font
 import pygame
 from settings import *
 from csvimport import import_csv_layout
 from enemy import Enemy
 from game_stats import GameStats
 from camera import YSortCameraGroup
-from main import PauseMenu
+from heartbeat import Heartbeat
 from tile import Tile
 from player import Player
 
@@ -23,12 +25,15 @@ class Level:
         self.death_counter = 0 
         self.stats = GameStats()
         self.paused_times = 0
-        self.encounter_distance = 500
+        self.encounter_distance = 700
         self.reset_distance = 2000
         self.in_encounter_range = False
         self.was_far_away = True
         self.number_chases = 0
         self.in_chase_radius = False 
+        self.heartbeat = Heartbeat()
+        self.chase_start_time = None
+        self.total_chase_time = 0
 
     def create_map(self,mission_name):
         layouts = {
@@ -65,6 +70,7 @@ class Level:
             f"Amount paused: {self.stats.amount_paused}",
             f"Escaped chases: {self.stats.chases_escaped}",
             f"Combined chase time: {self.stats.chase_times}",
+            f"Average heartbeat: {self.stats.avg_heartbeat}"
         ]
         start_y = (screen_height - (len(stats) * 50)) / 2
 
@@ -121,9 +127,10 @@ class Level:
         self.visible_sprites.custom_draw(self.player)
         self.visible_sprites.update()
         self.visible_sprites.enemy_update(self.player)
+        self.heartbeat.update(self.player, self.enemy)
+        self.heartbeat.draw(self.display_surface)
 
         chase_start_ticks = None  
-        total_chase_ticks = 0  
 
         for enemy in self.enemies:
             distance = ((self.player.rect.x - enemy.rect.x)**2 + (self.player.rect.y - enemy.rect.y)**2)**0.5
@@ -131,23 +138,22 @@ class Level:
             if pygame.sprite.collide_rect(self.player, enemy):
                 if self.in_chase_radius: 
                     self.number_chases += 1  
+                    self.total_chase_time += pygame.time.get_ticks() - self.chase_start_time
                 self.stats.pathfinding =  self.enemy.enemy_type 
                 self.stats.died = True 
-                self.stats.retry = False 
                 self.stats.won = False 
                 self.stats.time_played = self.player.get_time_played()
                 self.stats.amount_paused = self.paused_times
-                self.stats.chases_escaped = self.number_chases 
+                self.stats.chases_escaped = self.number_chases
+                self.stats.chase_times = self.total_chase_time / 1000 
+                self.stats.avg_heartbeat = self.heartbeat.get_avg_heartbeat()
                 self.stats_screen(self.display_surface)
                 return
             elif distance > enemy.chase_radius:  
                 if self.in_chase_radius: 
                     self.number_chases += 1  
                     self.in_chase_radius = False  
-                    chase_end_ticks = pygame.time.get_ticks() 
-                    total_chase_ticks += chase_end_ticks - chase_start_ticks 
-                    chase_start_ticks = None  
             elif distance <= enemy.chase_radius:
+                if not self.in_chase_radius:  
+                    self.chase_start_time = pygame.time.get_ticks()
                 self.in_chase_radius = True
-                if chase_start_ticks is None:  
-                    chase_start_ticks = pygame.time.get_ticks()

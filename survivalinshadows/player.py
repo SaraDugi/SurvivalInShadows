@@ -26,6 +26,8 @@ class Player(Entity):
 		self.last_speed_boost = 0 
 		self.start_ticks = pygame.time.get_ticks()  
 		self.mood = 'normal'
+		self.heartbeat_color = (0, 255, 0) 
+		self.heartbeat_ticks = 0 
 
 	def import_player_assets(self):
 		character_path = 'Graphics/Character_model/'
@@ -117,6 +119,7 @@ class Player(Entity):
 		self.draw_timer(pygame.display.get_surface())
 		self.update_health_bar(pygame.display.get_surface())
 		self.update_stamina_bar(pygame.display.get_surface())
+		 
 
 		if self.speed_boost_active and pygame.time.get_ticks() - self.last_speed_boost <= SPEED_BOOST_DURATION:
 			self.move(self.speed * 2)  

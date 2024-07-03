@@ -34,6 +34,7 @@ class Level:
         self.heartbeat = Heartbeat()
         self.chase_start_time = None
         self.total_chase_time = 0
+        self.previous_player_position = self.player.rect.topleft  # Store the initial player position
 
     def create_map(self,mission_name):
         layouts = {
@@ -70,8 +71,11 @@ class Level:
             f"Amount paused: {self.stats.amount_paused}",
             f"Escaped chases: {self.stats.chases_escaped}",
             f"Combined chase time: {self.stats.chase_times}",
-            f"Average heartbeat: {self.stats.avg_heartbeat}"
-        ]
+            f"Average heartbeat: {self.stats.avg_heartbeat}",
+            f"Most often heartbeat: {self.stats.most_often_mood}",
+            f"Rarest heartbeat: {self.stats.rarest_mood}",
+            f"Total distance travelled: {round(self.stats.total_distance_travelled, 2)} pixels",  
+       ]
         start_y = (screen_height - (len(stats) * 50)) / 2
 
         for i, stat in enumerate(stats):
@@ -147,6 +151,10 @@ class Level:
                 self.stats.chases_escaped = self.number_chases
                 self.stats.chase_times = self.total_chase_time / 1000 
                 self.stats.avg_heartbeat = self.heartbeat.get_avg_heartbeat()
+                self.stats.most_often_mood = self.heartbeat.get_mostoften_mood()
+                self.stats.rarest_mood = self.heartbeat.rarest_mood()
+                self.stats.total_distance_travelled += math.sqrt((self.player.rect.x - self.previous_player_position[0])**2 + (self.player.rect.y - self.previous_player_position[1])**2)
+                self.previous_player_position = self.player.rect.topleft 
                 self.stats_screen(self.display_surface)
                 return
             elif distance > enemy.chase_radius:  

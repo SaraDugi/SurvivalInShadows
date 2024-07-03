@@ -5,6 +5,7 @@ from settings import *
 from csvimport import import_folder
 from entity import *
 import pygame.gfxdraw 
+from collections import Counter
 
 class Player(Entity):
 	def __init__(self,pos,groups,obstacle_sprites):
@@ -119,8 +120,7 @@ class Player(Entity):
 		self.draw_timer(pygame.display.get_surface())
 		self.update_health_bar(pygame.display.get_surface())
 		self.update_stamina_bar(pygame.display.get_surface())
-		 
-
+			 
 		if self.speed_boost_active and pygame.time.get_ticks() - self.last_speed_boost <= SPEED_BOOST_DURATION:
 			self.move(self.speed * 2)  
 		else:

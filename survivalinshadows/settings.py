@@ -2,6 +2,8 @@ WIDTH = 1080
 HEIGHT = 700
 FPS = 60
 
+MAX_STEPS =  100
+
 TILESIZE = 48
 
 BAR_HEIGHT = 00
@@ -29,13 +31,14 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 
 STAMINA_REDUCTION = 10  
-STAMINA_COOLDOWN = 1500  
+STAMINA_COOLDOWN = 1000  
 SPEED_BOOST_DURATION = 5000
 
 MAIN_OPTIONS = ['Start Game', 'Settings','Exit Game']
 MISSION_OPTIONS = ['Mission 1', 'Mission 2', 'Mission 3', 'Mission 4', 'Mission 5', 'Back']
-PAUSE_OPTIONS = ['Resume','Quit to start menu', 'Quit the game']
+PAUSE_OPTIONS = ['Resume', 'Restart game', 'Settings','Quit to start menu', 'Quit the game']
+SETTINGS_OPTIONS = ['Controls', 'Graphics','Sound', 'Back', 'Quit Game', 'Return to Desktop']
 
 monster_data =  {
-    '1': {'speed':3, 'damage': 100, 'chase_radius': 700, 'notice_radius': 3000}
+    '1': {'speed':3, 'damage': 100, 'chase_radius': 5000, 'notice_radius': 100}
 }

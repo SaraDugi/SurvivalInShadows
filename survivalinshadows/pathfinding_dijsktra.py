@@ -13,7 +13,7 @@ class Dijkstra:
     def __eq__(self, other):
         return self.position == other.position
 
-def dijkstra_pathfinding(maze, start, end):
+def dijkstra_pathfinding(maze, start, end, max_steps):
     start_node = Dijkstra(None, start)
     end_node = Dijkstra(None, end)
     open_list = []  
@@ -25,9 +25,8 @@ def dijkstra_pathfinding(maze, start, end):
     nodes_visited = 0
     while open_list:
         nodes_visited += 1
-        if nodes_visited % 1000 == 0:  
+        if nodes_visited == max_steps:  
             print(f"Visited {nodes_visited} nodes, open list size is {len(open_list)}")
-        if nodes_visited == 1200:
             return
         current_node = heappop(open_list)
         open_set.remove(current_node.position)
@@ -39,17 +38,17 @@ def dijkstra_pathfinding(maze, start, end):
                 path.append(current.position)
                 current = current.parent
             return path[::-1]
-        closed_list[current_node.position[0]][current_node.position[1]] = True
-        for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]:
+        closed_list[current_node.position[1]][current_node.position[0]] = True
+        for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
             node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
 
-            if not(0 <= node_position[0] < len(maze)) or not(0 <= node_position[1] < len(maze[0])):
+            if not(0 <= node_position[1] < len(maze)) or not(0 <= node_position[0] < len(maze[0])):
                 continue
 
-            if maze[node_position[0]][node_position[1]] == -1:
+            if maze[node_position[1]][node_position[0]] == "0":
                 continue
 
-            if closed_list[node_position[0]][node_position[1]]:
+            if closed_list[node_position[1]][node_position[0]]:
                 continue
 
             new_node = Dijkstra(current_node, node_position)

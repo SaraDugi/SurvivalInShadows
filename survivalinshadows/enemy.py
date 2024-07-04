@@ -4,10 +4,10 @@ from entity import *
 from csvimport import *
 from pathfidning_astar import  astar_pathfinding
 from pathfidning_bfs import bfs_pathfinding
-from pathfidning_decisiontrees import decision_tree_pathfinding
 from pathfidning_knn import knn_pathfinding
 from pathfinding_dijsktra import dijkstra_pathfinding
 import sys
+from pathfidning_greedy import greedy_pathfinding
 
 class Enemy(Entity):
     def __init__(self,enemy_type,name, pos, groups, obstacle_sprites):
@@ -50,53 +50,27 @@ class Enemy(Entity):
         maze = read_csv_file('Graphics/Map/CSV/abandonefactory_limit.csv')  
         start = (int(self.rect.x//TILESIZE), int(self.rect.y//TILESIZE))
         end = (int(player.rect.x//TILESIZE), int(player.rect.y//TILESIZE))
-        print(self.rect)
-        print(self.direction, "test0")
-        if self.enemy_type == 'a*':
-            if self.rect.x % TILESIZE != 0 or self.rect.y % TILESIZE != 0:
-                None
-            else:
-                path = astar_pathfinding(maze, start, end)
-                if path is not None and len(path) > 0:
-                    next_step = list(path[1])
-                    next_step[0] *= TILESIZE
-                    next_step[1] *= TILESIZE
-                    self.direction = pygame.math.Vector2(next_step[0] - self.rect.x, next_step[1] - self.rect.y)
-            print(self.direction, "test")
-            self.move(3) 
-            print(self.direction, "test1")
-        if self.enemy_type == 'bfs':
-            path = bfs_pathfinding(maze, start, end)
+        path = None
+        if self.rect.x % TILESIZE == 0 and self.rect.y % TILESIZE == 0:
+            if self.enemy_type == 'a*':
+                path = astar_pathfinding(maze, start, end, MAX_STEPS)
+            elif self.enemy_type == 'bfs':
+                path = bfs_pathfinding(maze, start, end, MAX_STEPS)
+            elif self.enemy_type == 'd':
+                path = dijkstra_pathfinding(maze, start, end, MAX_STEPS)
+            elif self.enemy_type == 'greedy':
+                path = greedy_pathfinding(maze, start, end, MAX_STEPS)
+            elif self.enemy_type == 'knn':
+                path = knn_pathfinding(maze, start, end, MAX_STEPS)
+            
             if path is not None and len(path) > 0:
                 next_step = list(path[1])
                 next_step[0] *= TILESIZE
                 next_step[1] *= TILESIZE
                 self.direction = pygame.math.Vector2(next_step[0] - self.rect.x, next_step[1] - self.rect.y)
-                self.move(3)
-        if self.enemy_type == 'dt':
-            path = decision_tree_pathfinding(maze, start, end)
-            if path is not None and len(path) > 0:
-                next_step = list(path[1])
-                next_step[0] *= TILESIZE
-                next_step[1] *= TILESIZE
-                self.direction = pygame.math.Vector2(next_step[0] - self.rect.x, next_step[1] - self.rect.y)
-                self.move(3)    
-        if self.enemy_type == 'knn':
-            path = knn_pathfinding(maze, start, end)
-            if path is not None and len(path) > 0:
-                next_step = list(path[1])
-                next_step[0] *= TILESIZE
-                next_step[1] *= TILESIZE
-                self.direction = pygame.math.Vector2(next_step[0] - self.rect.x, next_step[1] - self.rect.y)
-                self.move(3)
-        if self.enemy_type == 'd':
-            path = dijkstra_pathfinding(maze, start, end)
-            if path is not None and len(path) > 1:
-                next_step = list(path[1])
-                next_step[0] *= TILESIZE
-                next_step[1] *= TILESIZE
-                self.direction = pygame.math.Vector2(next_step[0] - self.rect.x, next_step[1] - self.rect.y)
-                self.move(3)
+        
+        if path != None or self.rect.x % TILESIZE != 0 or self.rect.y % TILESIZE != 0:
+            self.move(3)
         
     def get_player_distance_direction(self,player):
         enemy_vec = pygame.math.Vector2(self.rect.center)

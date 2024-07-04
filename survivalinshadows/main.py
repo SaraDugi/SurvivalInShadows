@@ -111,7 +111,7 @@ def load_game(mission_name):
     elif mission_name == 'Mission 3':
             level.enemy.enemy_type = 'bfs'
     elif mission_name == 'Mission 4':
-            level.enemy.enemy_type = 'dt'
+            level.enemy.enemy_type = 'g'
     elif mission_name == 'Mission 5':
             level.enemy.enemy_type = 'knn'
 

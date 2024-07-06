@@ -4,27 +4,24 @@ from entity import *
 from csvimport import *
 from pathfidning_astar import  astar_pathfinding
 from pathfidning_bfs import bfs_pathfinding
-from pathfidning_knn import knn_pathfinding
 from pathfinding_dijsktra import dijkstra_pathfinding
 import sys
 from pathfidning_greedy import greedy_pathfinding
+from pathfidning_bidirectional import bidirectional_pathfinding
 
 class Enemy(Entity):
     def __init__(self,enemy_type,name, pos, groups, obstacle_sprites):
         super().__init__(groups)
         self.sprite_type = 'enemy'
         self.enemy_type = enemy_type
-
         self.import_graphics(name)
         self.status = 'walk'
         self.image = self.animations[self.status][self.frame_index]
         self.rect = self.image.get_rect(topleft = pos)
-
         self.rect = self.image.get_rect(topleft = pos)
         self.hit_box = self.rect.inflate(0, 0)
         self.obstacle_sprites = obstacle_sprites
         self.frame_index = 0 
-            
         self.monster_name = name
         monster_info = monster_data[self.monster_name]
         self.speed = monster_info['speed']
@@ -32,6 +29,7 @@ class Enemy(Entity):
         self.chase_radius = monster_info['chase_radius']
         self.notice_radius = monster_info['notice_radius']
         self.next = None
+        self.nodes_explored = 0
 
     def import_graphics(self,name):
         self.animations = {'walk' : [], 'chase': []}
@@ -53,15 +51,15 @@ class Enemy(Entity):
         path = None
         if self.rect.x % TILESIZE == 0 and self.rect.y % TILESIZE == 0:
             if self.enemy_type == 'a*':
-                path = astar_pathfinding(maze, start, end, MAX_STEPS)
+                path = astar_pathfinding(maze, start, end, MAX_STEPS) 
             elif self.enemy_type == 'bfs':
                 path = bfs_pathfinding(maze, start, end, MAX_STEPS)
             elif self.enemy_type == 'd':
                 path = dijkstra_pathfinding(maze, start, end, MAX_STEPS)
             elif self.enemy_type == 'greedy':
                 path = greedy_pathfinding(maze, start, end, MAX_STEPS)
-            elif self.enemy_type == 'knn':
-                path = knn_pathfinding(maze, start, end, MAX_STEPS)
+            elif self.enemy_type == 'bd':
+                path = bidirectional_pathfinding(maze, start, end, MAX_STEPS)
             
             if path is not None and len(path) > 0:
                 next_step = list(path[1])

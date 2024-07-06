@@ -1,4 +1,3 @@
-from collections import deque
 from heapq import heappush, heappop
 
 class Node:

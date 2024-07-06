@@ -21,8 +21,6 @@ class Menu:
         self.title = title
         self.options = options
         self.selected_option = 0
-        '''start_menu_music.play()
-        game_music.set_volume(0.8)'''
 
     def render(self):
         screen.blit(background, (0, 0))
@@ -113,7 +111,7 @@ def load_game(mission_name):
     elif mission_name == 'Mission 4':
             level.enemy.enemy_type = 'g'
     elif mission_name == 'Mission 5':
-            level.enemy.enemy_type = 'knn'
+            level.enemy.enemy_type = 'bd'
 
     print(f"Selected mission: {mission_name}")
     print(f"Enemy type: {level.enemy.enemy_type}")

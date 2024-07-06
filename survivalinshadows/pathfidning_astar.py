@@ -1,6 +1,4 @@
 from heapq import heappop, heappush
-from settings import *
-import math
 
 class Cell:
     def __init__(self, parent=None, g = -1.0, h = -1.0, f = -1.0):

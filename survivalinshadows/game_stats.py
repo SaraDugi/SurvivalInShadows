@@ -1,4 +1,8 @@
 
+import sys
+import pygame
+
+
 class GameStats:
     def __init__(self):
         self.pathfinding = '' 
@@ -14,15 +18,13 @@ class GameStats:
         self.most_often_mood = 'null'
         self.rarest_mood = 'null'
         self.total_distance_travelled = 0 
+        self.pathfinding_length = 0
 
         '''enemy not yet implemented'''
-        self.pathfinding_time = 0
-        self.pathfinding_length = 0
-        self.path_efficiency = 0  
         self.nodes_explored = 0
+        self.total_enemy_distance_travelled_sprint = 0 
 
         '''player not yet implemented'''
-        self.total_time_in_map_navigation = 0
         self.total_distance_travelled_sprint = 0 
         self.stamina_used = 0 
 

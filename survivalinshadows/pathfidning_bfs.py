@@ -1,6 +1,4 @@
 from collections import deque
-from settings import *
-import sys
 
 def bfs_pathfinding(grid_map, start, end, max_steps):
     start = (start[1], start[0])
@@ -9,13 +7,13 @@ def bfs_pathfinding(grid_map, start, end, max_steps):
     visited = [[False] * cols for _ in range(rows)]
     queue = deque([(start, [])]) 
     visited[start[0]][start[1]] = True
-    steps = 0
+    nodes_visited = 0
     while queue:
-        if steps == max_steps:
-            print(f"Visited {steps} nodes")
+        if nodes_visited == max_steps:
+            print(f"Visited {nodes_visited} nodes")
             return 
 
-        steps += 1
+        nodes_visited += 1
         (x, y), path = queue.popleft()
         if (x, y) == end: 
             return path + [(y, x)]
@@ -23,8 +21,8 @@ def bfs_pathfinding(grid_map, start, end, max_steps):
         for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
             nx, ny = x + dx, y + dy
             if 0 <= nx < rows and 0 <= ny < cols and grid_map[nx][ny] != "0" and not visited[nx][ny]:  
-                queue.append(((nx, ny), path + [(ny, nx)]))
+                queue.append(((nx, ny), path + [(y, x)]))
                 visited[nx][ny] = True
     
-    print("No path found")
+    print(f"No path found after visiting {nodes_visited} nodes")
     return None

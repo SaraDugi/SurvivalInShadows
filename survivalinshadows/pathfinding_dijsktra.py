@@ -1,5 +1,4 @@
 from heapq import heappop, heappush
-from settings import *
 
 class Dijkstra:
     def __init__(self, parent=None, position=None):
@@ -38,6 +37,7 @@ def dijkstra_pathfinding(maze, start, end, max_steps):
                 path.append(current.position)
                 current = current.parent
             return path[::-1]
+            
         closed_list[current_node.position[1]][current_node.position[0]] = True
         for new_position in [(0, -1), (0, 1), (-1, 0), (1, 0)]:
             node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])

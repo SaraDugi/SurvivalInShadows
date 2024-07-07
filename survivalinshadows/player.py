@@ -16,12 +16,12 @@ class Player(Entity):
 		self.import_player_assets()
 		self.status = 'down'
 		self.obstacle_sprites = obstacle_sprites
-		self.stats = {'health': 250, 'stamina':150, 'speed':2}
+		self.stats = {'health' : 250, 'stamina' : 3, 'speed' : 2}
 		self.health = self.stats['health']
 		self.energy = self.stats['stamina']
 		self.speed = self.stats['speed']
 		self.health_bar = pygame.Rect(10, 10, self.health, 25) 
-		self.stamina_bar = pygame.Rect(10, 40, self.energy, 25)
+		self.stamina_counter = self.energy
 		self.last_stamina_reduction = pygame.time.get_ticks() 
 		self.speed_boost_active = False  
 		self.last_speed_boost = 0 
@@ -30,11 +30,11 @@ class Player(Entity):
 		self.heartbeat_color = (0, 255, 0) 
 		self.heartbeat_ticks = 0 
 		self.total_distance_running = 0
+		self.tab_press_count = 0
 
 	def import_player_assets(self):
 		character_path = 'Graphics/Character_model/'
-		self.animations = {'up': [],'down': [],'left': [],'right': [],
-			'right_idle':[],'left_idle':[],'up_idle':[],'down_idle':[]}
+		self.animations = {'up': [],'down': [],'left': [],'right': [], 'right_idle':[],'left_idle':[],'up_idle':[],'down_idle':[]}
 
 		for animation in self.animations.keys():
 			full_path = character_path + animation
@@ -64,13 +64,13 @@ class Player(Entity):
 		else:
 			self.direction.x = 0
 
-		if keys[pygame.K_TAB]:  		
+		if keys[pygame.K_TAB] and self.stamina_counter > 0 and not self.speed_boost_active:  		
 			current_time = pygame.time.get_ticks()
 			if current_time - STAMINA_COOLDOWN >= STAMINA_COOLDOWN:  
-				self.energy -= STAMINA_REDUCTION  
-				self.stamina_bar.width = self.energy
+				self.stamina_counter -= 1 
 				self.last_stamina_reduction = current_time  
 				self.speed_boost_active = True  
+				self.last_speed_boost = current_time  
 				self.last_speed_boost = current_time  
 	
 	def get_status(self):
@@ -92,6 +92,23 @@ class Player(Entity):
 		text_rect = text_surface.get_rect(center=(screen.get_width() // 2, 50))
 		screen.blit(text_surface, text_rect)
 
+	def draw_stamina_items(self, screen):
+		stamina_pos = (10, 10)
+		font = pygame.font.Font(None, 36)  
+		text = "Stamina usage left: "
+		text_surface = font.render(text, True, (255, 255, 255))
+		screen.blit(text_surface, (stamina_pos[0], stamina_pos[1]))
+		
+		if self.stamina_counter > 2:
+			color = (0, 255, 0)  
+		elif self.stamina_counter > 1:
+			color = (255, 165, 0)  
+		else:
+			color = (255, 0, 0)
+
+		counter_surface = font.render(str(self.stamina_counter), True, color)
+		screen.blit(counter_surface, (stamina_pos[0] + text_surface.get_width(), stamina_pos[1]))
+
 	def get_time_played(self):
 		total_seconds = (pygame.time.get_ticks() - self.start_ticks) / 1000
 		playtime = datetime.timedelta(seconds=int(total_seconds))
@@ -107,20 +124,13 @@ class Player(Entity):
 		self.image = animation[int(self.frame_index)]
 		self.rect = self.image.get_rect(center = self.hit_box.center)
 
-	def update_health_bar(self, screen):
-		pygame.draw.rect(screen, (255,0,0), self.health_bar)
-
-	def update_stamina_bar(self, screen):
-		pygame.draw.rect(screen, (0,255,0), self.stamina_bar)
-		
 	def update(self):
 		self.input()
 		self.get_status()
 		self.animate()
 		self.move(self.speed)
+		self.draw_stamina_items(pygame.display.get_surface())
 		self.draw_timer(pygame.display.get_surface())
-		self.update_health_bar(pygame.display.get_surface())
-		self.update_stamina_bar(pygame.display.get_surface())
 			 
 		if self.speed_boost_active and pygame.time.get_ticks() - self.last_speed_boost <= SPEED_BOOST_DURATION:
 			self.move(self.speed * 2)  

@@ -28,14 +28,18 @@ class Heartbeat:
 
     def draw(self, screen):
         if self.heartbeat < 95:
-            color = (0, 255, 0) 
+            color = (0, 255, 0)  
         elif self.heartbeat < 140:
             color = (255, 165, 0)  
         else:
-            color = (255, 0, 0)  
+            color = (255, 0, 0)
 
-        text = self.font.render(str(int(self.heartbeat)), True, color)
-        screen.blit(text, (10, 65))  
+        text = "Heartbeat: "
+        text_surface = self.font.render(text, True, (255, 255, 255))
+        screen.blit(text_surface, (10, 45))
+        heartbeat_surface = self.font.render(str(int(self.heartbeat)), True, color)
+        screen.blit(heartbeat_surface, (10 + text_surface.get_width(), 45))
+
 
     def get_avg_heartbeat(self):
         return round(self.total_heartbeat / self.heartbeat_count, 2) if self.heartbeat_count else 0

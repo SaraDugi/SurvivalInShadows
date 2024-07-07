@@ -34,10 +34,9 @@ STAMINA_REDUCTION = 10
 STAMINA_COOLDOWN = 1000  
 SPEED_BOOST_DURATION = 5000
 
-MAIN_OPTIONS = ['Start Game', 'Settings','Exit Game']
-MISSION_OPTIONS = ['Mission 1', 'Mission 2', 'Mission 3', 'Mission 4', 'Mission 5', 'Back']
-PAUSE_OPTIONS = ['Resume', 'Restart game', 'Settings','Quit to start menu', 'Quit the game']
-SETTINGS_OPTIONS = ['Controls', 'Graphics','Sound', 'Back', 'Quit Game', 'Return to Desktop']
+MAIN_OPTIONS = ['Start Game', 'Exit Game']
+MISSION_OPTIONS = ['Mission 1', 'Mission 2', 'Mission 3', 'Mission 4', 'Mission 5']
+PAUSE_OPTIONS = ['Resume', 'Quit to start menu', 'Quit the game']
 
 monster_data =  {
     '1': {'speed':3, 'damage': 100, 'chase_radius': 5000, 'notice_radius': 100}

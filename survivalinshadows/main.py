@@ -1,4 +1,3 @@
-import os
 import pygame
 import sys
 from level import *
@@ -44,6 +43,28 @@ class Menu:
             elif event.key == pygame.K_DOWN and self.selected_option < len(self.options) - 1:
                 self.selected_option += 1
 
+class StartScreen(Menu):
+    def __init__(self, title, instructions):
+        super().__init__(title, [])
+        self.instructions = instructions
+
+    def render(self):
+        screen.fill((0, 0, 0))  
+        title_text = font.render(self.title, True, WHITE)
+        title_rect = title_text.get_rect(center=(WIDTH / 2, HEIGHT / 4))
+        screen.blit(title_text, title_rect)
+        
+        for i, instruction in enumerate(self.instructions):
+            text = font.render(instruction, True, WHITE)
+            text_rect = text.get_rect(center=(WIDTH / 2, HEIGHT / 2 + (i - len(self.instructions) / 2) * 60))
+            screen.blit(text, text_rect)
+        pygame.display.flip()
+
+    def handle_event(self, event):
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            return False
+        return True
+
 class PauseMenu(Menu):
     def __init__(self, title, options, mission_name,level):
         super().__init__(title, options)
@@ -67,32 +88,6 @@ class PauseMenu(Menu):
                     return 'main_menu'
         return True
 
-class SettingsMenu(Menu):
-    def __init__(self, title, options, mission_name):
-        super().__init__(title, options)
-        self.font = pygame.font.Font(None, 36) 
-        self.color_selected = (255, 255, 255)  
-        self.color_unselected = (100, 100, 100)
-
-    def draw(self, screen):
-        for i, option in enumerate(self.options):
-            if i == self.selected_option:
-                color = self.color_selected
-            else:
-                color = self.color_unselected
-            text = self.font.render(option, True, color)
-            screen.blit(text, (50, 50 + i * 40)) 
-
-    def handle_event(self, event):
-        screen.fill(BLACK)
-        self.draw(screen)
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP and self.selected_option > 0:
-                self.selected_option -= 1
-            elif event.key == pygame.K_DOWN and self.selected_option < len(self.options) - 1:
-                self.selected_option += 1
-        return True
-
 def load_game(mission_name):
     level = Level(mission_name) 
     clock = pygame.time.Clock()
@@ -112,9 +107,6 @@ def load_game(mission_name):
             level.enemy.enemy_type = 'g'
     elif mission_name == 'Mission 5':
             level.enemy.enemy_type = 'bd'
-
-    print(f"Selected mission: {mission_name}")
-    print(f"Enemy type: {level.enemy.enemy_type}")
 
     running = True
     while running:
@@ -157,6 +149,20 @@ def main():
                     elif current_menu == mission_menu:
                         mission_name = f"Mission {current_menu.selected_option + 1}"
                         print(mission_name + " selected!")
+                        
+                        start_screen = StartScreen("Survive for the longest you can!", [
+                            '',
+                            '',
+                            "Controls:",
+                            "Arrow keys for moving",
+                            "TAB for sprint",
+                            '',
+                            '',
+                            "Press SPACE to start the game"
+                        ])
+                        while start_screen.handle_event(pygame.event.wait()):
+                            start_screen.render()
+                        
                         load_game(mission_name)
                         current_menu = start_menu
                 else:
@@ -164,7 +170,6 @@ def main():
 
         current_menu.render()
         pygame.display.flip()
-
     pygame.quit()
     sys.exit()
 

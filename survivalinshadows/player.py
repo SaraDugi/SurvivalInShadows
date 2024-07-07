@@ -16,7 +16,7 @@ class Player(Entity):
 		self.import_player_assets()
 		self.status = 'down'
 		self.obstacle_sprites = obstacle_sprites
-		self.stats = {'health' : 250, 'stamina' : 3, 'speed' : 2}
+		self.stats = {'health' : 250, 'stamina' : 3, 'speed' : 0.75}
 		self.health = self.stats['health']
 		self.energy = self.stats['stamina']
 		self.speed = self.stats['speed']
@@ -30,7 +30,8 @@ class Player(Entity):
 		self.heartbeat_color = (0, 255, 0) 
 		self.heartbeat_ticks = 0 
 		self.total_distance_running = 0
-		self.tab_press_count = 0
+		self.used_stamina = 0
+		self.player_sprint_total = 0
 
 	def import_player_assets(self):
 		character_path = 'Graphics/Character_model/'
@@ -66,12 +67,15 @@ class Player(Entity):
 
 		if keys[pygame.K_TAB] and self.stamina_counter > 0 and not self.speed_boost_active:  		
 			current_time = pygame.time.get_ticks()
-			if current_time - STAMINA_COOLDOWN >= STAMINA_COOLDOWN:  
+			if current_time - STAMINA_COOLDOWN >= STAMINA_COOLDOWN: 
+				self.last_speed_boost = current_time 
 				self.stamina_counter -= 1 
 				self.last_stamina_reduction = current_time  
 				self.speed_boost_active = True  
 				self.last_speed_boost = current_time  
-				self.last_speed_boost = current_time  
+				self.used_stamina  += 1
+				self.speed *= 2  
+
 	
 	def get_status(self):
 		if self.direction.x == 0 and self.direction.y == 0:
@@ -79,7 +83,7 @@ class Player(Entity):
 				self.status = self.status + '_idle'
 
 	def draw_timer(self, screen):
-		total_seconds = 600 - (pygame.time.get_ticks() - self.start_ticks) / 1000  
+		total_seconds = 300 - (pygame.time.get_ticks() - self.start_ticks) / 1000  
 		if total_seconds < 0:
 			total_seconds = 0
 		minutes = total_seconds // 60
@@ -123,8 +127,18 @@ class Player(Entity):
 			self.frame_index = 0
 		self.image = animation[int(self.frame_index)]
 		self.rect = self.image.get_rect(center = self.hit_box.center)
+	
+	def draw_light_mask(self, screen):
+		fog = pygame.Surface((screen.get_width(), screen.get_height()))  
+		fog.fill((0, 0, 0))  
+		transparency = 128  
+		fog.set_alpha(transparency) 
+		light_radius = 100 
+		pygame.draw.circle(fog, (0, 0, 0, 0), self.rect.center, light_radius)  
+		screen.blit(fog, (0, 0))  
 
 	def update(self):
+		self.draw_light_mask(pygame.display.get_surface())
 		self.input()
 		self.get_status()
 		self.animate()
@@ -138,3 +152,7 @@ class Player(Entity):
 		else:
 			self.speed_boost_active = False  
 			self.move(2)
+		if self.speed_boost_active:
+			self.player_sprint_total += math.sqrt((self.rect.x - self.previous_player_position[0])**2 + (self.rect.y - self.previous_player_position[1])**2)
+		self.previous_player_position = self.rect.topleft
+

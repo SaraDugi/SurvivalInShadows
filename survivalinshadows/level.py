@@ -77,7 +77,8 @@ class Level:
             f"Most often heartbeat: {self.stats.most_often_mood}",
             f"Rarest heartbeat: {self.stats.rarest_mood}",
             f"Total distance traveled: {round(self.stats.total_distance_travelled, 2)} pixels",
-            f"Total distance traveled while sprinting: {self.stats.total_enemy_distance_travelled_sprint} pixels",   
+            f"Stamina used: {self.stats.stamina_used}",
+            f"Total distance traveled while running: {self.stats.player_distance_sprinted}",
        ]
         start_y = (screen_height - (len(stats) * 50)) / 2
 
@@ -106,7 +107,8 @@ class Level:
             f"Pathfinding: {self.stats.pathfinding}",
             f"Escaped chases: {self.stats.chases_escaped}",
             f"Combined chase time: {self.stats.chase_times}",
-            f"Lenght of pathfinding: {round(self.stats.pathfinding_length, 2)} pixels"
+            f"Lenght of pathfinding: {round(self.stats.pathfinding_length, 2)} pixels",
+            f"Lenght of path while player is running: {self.stats.total_enemy_distance_travelled_sprint} pixels"
        ]
         start_y = (screen_height - (len(stats) * 50)) / 2
 
@@ -125,6 +127,15 @@ class Level:
                         self.game_over_screen(display_surface)
                         break
             pygame.display.flip()
+
+    def draw_light_mask(self, screen):
+        fog = pygame.Surface((screen.get_width(), screen.get_height()))  
+        fog.fill((0, 0, 0)) 
+        transparency = 128  
+        fog.set_alpha(transparency)  
+        light_radius = 100  
+        pygame.draw.circle(fog, (0, 0, 0, 0), self.rect.center, light_radius) 
+        screen.blit(fog, (0, 0))  
 
     def game_over_screen(self, display_surface):
         screen_width, screen_height = display_surface.get_size()
@@ -162,7 +173,6 @@ class Level:
         self.visible_sprites.enemy_update(self.player)
         self.heartbeat.update(self.player, self.enemy)
         self.heartbeat.draw(self.display_surface)
-
         chase_start_ticks = None  
 
         for enemy in self.enemies:
@@ -175,6 +185,7 @@ class Level:
                 self.stats.pathfinding =  self.enemy.enemy_type 
                 self.stats.died = True 
                 self.stats.won = False 
+                self.stats.stamina_used = self.player.used_stamina
                 self.stats.time_played = self.player.get_time_played()
                 self.stats.amount_paused = self.paused_times
                 self.stats.chases_escaped = self.number_chases
@@ -186,6 +197,8 @@ class Level:
                 self.previous_player_position = self.player.rect.topleft 
                 self.stats.pathfinding_length += math.sqrt((self.enemy.rect.x - self.previous_enemy_position[0])**2 + (self.enemy.rect.y - self.previous_enemy_position[1])**2)
                 self.previous_enemy_position = self.enemy.rect.topleft
+                self.stats.total_enemy_distance_travelled_sprint = self.enemy.total_distance_while_player_sprints
+                self.stats.player_distance_sprinted = self.player.player_sprint_total
                 self.stats_screenPlayer(self.display_surface)
                 return
             elif distance > enemy.chase_radius:  

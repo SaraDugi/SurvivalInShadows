@@ -5,7 +5,6 @@ from csvimport import *
 from pathfidning_astar import  astar_pathfinding
 from pathfidning_bfs import bfs_pathfinding
 from pathfinding_dijsktra import dijkstra_pathfinding
-import sys
 from pathfidning_greedy import greedy_pathfinding
 from pathfidning_bidirectional import bidirectional_pathfinding
 
@@ -29,7 +28,8 @@ class Enemy(Entity):
         self.chase_radius = monster_info['chase_radius']
         self.notice_radius = monster_info['notice_radius']
         self.next = None
-        self.nodes_explored = 0
+        self.total_distance_while_player_sprints = 0
+        self.total_nodes_visited = 0
 
     def import_graphics(self,name):
         self.animations = {'walk' : [], 'chase': []}
@@ -37,12 +37,14 @@ class Enemy(Entity):
         for animation in self.animations.keys():
             self.animations[animation] = import_folder(main_path + animation)
 
-    def get_status(self,player):
+    def get_status(self, player):
         distance = self.get_player_distance_direction(player)[0]
-        if distance <= self.notice_radius:
+        if distance <= self.chase_radius:
             self.status = 'chase'
+            self.speed = self.speed * 2  
         else:
             self.status = 'walk'
+            self.speed = 3
 
     def enemy_move(self, player):
         maze = read_csv_file('Graphics/Map/CSV/abandonefactory_limit.csv')  
@@ -68,8 +70,8 @@ class Enemy(Entity):
                 self.direction = pygame.math.Vector2(next_step[0] - self.rect.x, next_step[1] - self.rect.y)
         
         if path != None or self.rect.x % TILESIZE != 0 or self.rect.y % TILESIZE != 0:
-            self.move(3)
-        
+            self.move(3)            
+
     def get_player_distance_direction(self,player):
         enemy_vec = pygame.math.Vector2(self.rect.center)
         player_vec = pygame.math.Vector2(player.rect.center)
@@ -81,6 +83,10 @@ class Enemy(Entity):
             direction = pygame.math.Vector2()
         return (distance,direction)
     
+    def explore(self, maze, start, end, max_steps):
+        path, nodes_visited = astar_pathfinding(maze, start, end, max_steps)
+        self.nodes_explored += nodes_visited
+
     def actions(self,player):
         if self.status == 'walk':
             self.direction = self.get_player_distance_direction(player)[1]
@@ -103,3 +109,6 @@ class Enemy(Entity):
         self.get_status(player)
         self.enemy_move(player) 
         self.animate()
+        if player.speed_boost_active:
+            self.total_distance_while_player_sprints += math.sqrt((self.rect.x - self.previous_enemy_position[0])**2 + (self.rect.y - self.previous_enemy_position[1])**2)
+        self.previous_enemy_position = self.rect.topleft

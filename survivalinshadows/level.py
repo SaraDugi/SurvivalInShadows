@@ -1,4 +1,3 @@
-import datetime
 import math
 import sys
 from tkinter import font
@@ -11,7 +10,6 @@ from camera import YSortCameraGroup
 from heartbeat import Heartbeat
 from tile import Tile
 from player import Player
-import time
 
 class Level:
     def __init__(self, mission_name):
@@ -39,6 +37,7 @@ class Level:
         self.previous_enemy_position = self.enemy.rect.topleft  
         self.path_efficiency = 0
         self.nodes_explored = 0 
+        self.start_ticks = pygame.time.get_ticks()  
 
     def create_map(self,mission_name):
         layouts = {
@@ -61,6 +60,7 @@ class Level:
                         elif style == 'enemy':
                             if col == '0':
                                 None
+
     def stats_screenPlayer(self, display_surface):
         screen_width, screen_height = display_surface.get_size()
         display_surface.fill((50, 50, 50))  
@@ -78,7 +78,6 @@ class Level:
             f"Rarest heartbeat: {self.stats.rarest_mood}",
             f"Total distance traveled: {round(self.stats.total_distance_travelled, 2)} pixels",
             f"Stamina used: {self.stats.stamina_used}",
-            f"Total distance traveled while running: {self.stats.player_distance_sprinted}",
        ]
         start_y = (screen_height - (len(stats) * 50)) / 2
 
@@ -173,7 +172,6 @@ class Level:
         self.visible_sprites.enemy_update(self.player)
         self.heartbeat.update(self.player, self.enemy)
         self.heartbeat.draw(self.display_surface)
-        chase_start_ticks = None  
 
         for enemy in self.enemies:
             distance = ((self.player.rect.x - enemy.rect.x)**2 + (self.player.rect.y - enemy.rect.y)**2)**0.5
@@ -198,7 +196,6 @@ class Level:
                 self.stats.pathfinding_length += math.sqrt((self.enemy.rect.x - self.previous_enemy_position[0])**2 + (self.enemy.rect.y - self.previous_enemy_position[1])**2)
                 self.previous_enemy_position = self.enemy.rect.topleft
                 self.stats.total_enemy_distance_travelled_sprint = self.enemy.total_distance_while_player_sprints
-                self.stats.player_distance_sprinted = self.player.player_sprint_total
                 self.stats_screenPlayer(self.display_surface)
                 return
             elif distance > enemy.chase_radius:  
@@ -209,3 +206,28 @@ class Level:
                 if not self.in_chase_radius:  
                     self.chase_start_time = pygame.time.get_ticks()
                 self.in_chase_radius = True
+
+        total_seconds = 300 - (pygame.time.get_ticks() - self.start_ticks) / 1000  
+        if total_seconds <= 0:
+            if self.in_chase_radius: 
+                self.number_chases += 1  
+                self.total_chase_time += pygame.time.get_ticks() - self.chase_start_time
+            self.stats.pathfinding =  self.enemy.enemy_type 
+            self.stats.died = False 
+            self.stats.won = True 
+            self.stats.stamina_used = self.player.used_stamina
+            self.stats.time_played = self.player.get_time_played()
+            self.stats.amount_paused = self.paused_times
+            self.stats.chases_escaped = self.number_chases
+            self.stats.chase_times = self.total_chase_time / 1000 
+            self.stats.avg_heartbeat = self.heartbeat.get_avg_heartbeat()
+            self.stats.most_often_mood = self.heartbeat.get_mostoften_mood()
+            self.stats.rarest_mood = self.heartbeat.rarest_mood()
+            self.stats.total_distance_travelled += math.sqrt((self.player.rect.x - self.previous_player_position[0])**2 + (self.player.rect.y - self.previous_player_position[1])**2)
+            self.previous_player_position = self.player.rect.topleft 
+            self.stats.pathfinding_length += math.sqrt((self.enemy.rect.x - self.previous_enemy_position[0])**2 + (self.enemy.rect.y - self.previous_enemy_position[1])**2)
+            self.previous_enemy_position = self.enemy.rect.topleft
+            self.stats.total_enemy_distance_travelled_sprint = self.enemy.total_distance_while_player_sprints
+            self.stats_screenPlayer(self.display_surface)
+            return
+            

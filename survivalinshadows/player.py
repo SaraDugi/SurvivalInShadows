@@ -31,7 +31,6 @@ class Player(Entity):
 		self.heartbeat_ticks = 0 
 		self.total_distance_running = 0
 		self.used_stamina = 0
-		self.player_sprint_total = 0
 
 	def import_player_assets(self):
 		character_path = 'Graphics/Character_model/'
@@ -127,18 +126,8 @@ class Player(Entity):
 			self.frame_index = 0
 		self.image = animation[int(self.frame_index)]
 		self.rect = self.image.get_rect(center = self.hit_box.center)
-	
-	def draw_light_mask(self, screen):
-		fog = pygame.Surface((screen.get_width(), screen.get_height()))  
-		fog.fill((0, 0, 0))  
-		transparency = 128  
-		fog.set_alpha(transparency) 
-		light_radius = 100 
-		pygame.draw.circle(fog, (0, 0, 0, 0), self.rect.center, light_radius)  
-		screen.blit(fog, (0, 0))  
 
 	def update(self):
-		self.draw_light_mask(pygame.display.get_surface())
 		self.input()
 		self.get_status()
 		self.animate()
@@ -147,12 +136,8 @@ class Player(Entity):
 		self.draw_timer(pygame.display.get_surface())
 			 
 		if self.speed_boost_active and pygame.time.get_ticks() - self.last_speed_boost <= SPEED_BOOST_DURATION:
+			self.speed_boost_active = True  
 			self.move(self.speed * 2)  
-			self.previous_player_position = self.rect.topleft 
 		else:
 			self.speed_boost_active = False  
 			self.move(2)
-		if self.speed_boost_active:
-			self.player_sprint_total += math.sqrt((self.rect.x - self.previous_player_position[0])**2 + (self.rect.y - self.previous_player_position[1])**2)
-		self.previous_player_position = self.rect.topleft
-

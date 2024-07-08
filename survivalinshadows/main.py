@@ -84,14 +84,12 @@ class PauseMenu(Menu):
                 elif self.options[self.selected_option] == 'Quit Game':
                     pygame.quit()
                     sys.exit()
-                elif self.options[self.selected_option] == 'Quit to Title':
-                    return 'main_menu'
         return True
 
 def load_game(mission_name):
     level = Level(mission_name) 
     clock = pygame.time.Clock()
-    pause_menu = PauseMenu('Paused', ['Resume', 'Quit Game', 'Quit to Title'], mission_name, level)
+    pause_menu = PauseMenu('Paused', ['Resume', 'Quit Game'], mission_name, level)
     paused = False
     start_menu_music.stop()
     game_music.play()

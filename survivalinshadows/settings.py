@@ -37,6 +37,7 @@ SPEED_BOOST_DURATION = 5000
 MAIN_OPTIONS = ['Start Game', 'Exit Game']
 MISSION_OPTIONS = ['Mission 1', 'Mission 2', 'Mission 3', 'Mission 4', 'Mission 5']
 PAUSE_OPTIONS = ['Resume', 'Quit to start menu', 'Quit the game']
+GAMEOVER_OPTIONS = ['Quit Game']
 
 monster_data =  {
     '1': {'speed':3, 'damage': 100, 'chase_radius': 5000, 'notice_radius': 100}

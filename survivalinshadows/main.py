@@ -151,7 +151,7 @@ def main():
                         start_screen = StartScreen("Survive for the longest you can!", [
                             '',
                             '',
-                            "Controls:",
+                            '',
                             "Arrow keys for moving",
                             "TAB for sprint",
                             '',

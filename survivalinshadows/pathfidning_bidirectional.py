@@ -46,7 +46,6 @@ def bidirectional_pathfinding(maze, start, end, max_steps):
         bfs(maze, e_queue, e_visited)
         intersect_node = is_intersecting(s_visited, e_visited)
         if intersect_node != None:
-            print(create_path(s_visited, e_visited, intersect_node))
             return create_path(s_visited, e_visited, intersect_node)
 
     print(f"No path found after visiting {nodes_visited} nodes")

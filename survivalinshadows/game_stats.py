@@ -14,7 +14,7 @@ class GameStats:
         self.stamina_used = 0 
         self.player_distance_sprinted = 0 
         #enemy stats
-        self.pathfinding = '' 
+        self.pathfinding = 'null' 
         self.chase_times = 0
         self.pathfinding_length = 0
         self.total_enemy_distance_travelled_sprint = 0

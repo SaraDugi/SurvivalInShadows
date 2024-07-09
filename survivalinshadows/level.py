@@ -1,7 +1,8 @@
 import math
 import sys
-from tkinter import font
 import pygame
+import requests
+from tkinter import font
 from settings import *
 from csvimport import import_csv_layout
 from enemy import Enemy
@@ -12,6 +13,8 @@ from tile import Tile
 from player import Player
 
 class Level:
+    url = "https://survivalinshadowsbackend.onrender.com/game-data"
+
     def __init__(self, mission_name):
         self.display_surface = pygame.display.get_surface()
         self.visible_sprites = YSortCameraGroup()
@@ -61,72 +64,6 @@ class Level:
                             if col == '0':
                                 None
 
-    def stats_screenPlayer(self, display_surface):
-        screen_width, screen_height = display_surface.get_size()
-        display_surface.fill((50, 50, 50))  
-        stats_font = pygame.font.Font(None, 50)
-
-        stats = [
-            f"Time played: {self.stats.time_played}",
-            f"Died: {self.stats.died}",
-            f"Won: {self.stats.won}",
-            f"Amount paused: {self.stats.amount_paused}",
-            f"Escaped chases: {self.stats.chases_escaped}",
-            f"Combined chase time: {self.stats.chase_times}",
-            f"Average heartbeat: {self.stats.avg_heartbeat}",
-            f"Most often heartbeat: {self.stats.most_often_mood}",
-            f"Rarest heartbeat: {self.stats.rarest_mood}",
-            f"Total distance traveled: {round(self.stats.total_distance_travelled, 2)} pixels",
-            f"Stamina used: {self.stats.stamina_used}",
-       ]
-        start_y = (screen_height - (len(stats) * 50)) / 2
-
-        for i, stat in enumerate(stats):
-            stats_text = stats_font.render(stat, True, (255, 255, 255))
-            stats_text_rect = stats_text.get_rect(center=(screen_width / 2, start_y + i * 50))
-            display_surface.blit(stats_text, stats_text_rect)
-
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN: 
-                        self.stats_screenEnemy(display_surface)
-                        break
-            pygame.display.flip()
-
-    def stats_screenEnemy(self, display_surface):
-        screen_width, screen_height = display_surface.get_size()
-        display_surface.fill((50, 50, 50))  
-        stats_font = pygame.font.Font(None, 50)
-
-        stats = [
-            f"Pathfinding: {self.stats.pathfinding}",
-            f"Escaped chases: {self.stats.chases_escaped}",
-            f"Combined chase time: {self.stats.chase_times}",
-            f"Lenght of pathfinding: {round(self.stats.pathfinding_length, 2)} pixels",
-            f"Lenght of path while player is running: {self.stats.total_enemy_distance_travelled_sprint} pixels"
-       ]
-        start_y = (screen_height - (len(stats) * 50)) / 2
-
-        for i, stat in enumerate(stats):
-            stats_text = stats_font.render(stat, True, (255, 255, 255))
-            stats_text_rect = stats_text.get_rect(center=(screen_width / 2, start_y + i * 50))
-            display_surface.blit(stats_text, stats_text_rect)
-
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN: 
-                        self.game_over_screen(display_surface)
-                        break
-            pygame.display.flip()
-
     def draw_light_mask(self, screen):
         fog = pygame.Surface((screen.get_width(), screen.get_height()))  
         fog.fill((0, 0, 0)) 
@@ -142,18 +79,15 @@ class Level:
         button_font = pygame.font.Font(None, 50)
         button_width, button_height = 300, 50
 
-        restart_button = pygame.Rect(screen_width / 2 - button_width / 2, screen_height / 2 - button_height - 10, button_width, button_height)
-        pygame.draw.rect(display_surface, (255, 255, 255), restart_button)  
-        restart_text = button_font.render("Restart", True, (0, 0, 0))  
-        restart_text_rect = restart_text.get_rect(center=restart_button.center)  
-        display_surface.blit(restart_text, restart_text_rect) 
+        buttons = []
+        for i, option in enumerate(GAMEOVER_OPTIONS):
+            button = pygame.Rect(screen_width / 2 - button_width / 2, screen_height / 2 - button_height - 10 + i * (button_height + 20), button_width, button_height)
+            pygame.draw.rect(display_surface, (255, 255, 255), button)  
+            text = button_font.render(option, True, (0, 0, 0))  
+            text_rect = text.get_rect(center=button.center)  
+            display_surface.blit(text, text_rect)
+            buttons.append(button)
 
-        quit_button = pygame.Rect(screen_width / 2 - button_width / 2, screen_height / 2 + 10, button_width, button_height)
-        pygame.draw.rect(display_surface, (255, 255, 255), quit_button)  
-        quit_text = button_font.render("Quit", True, (0, 0, 0))  
-        quit_text_rect = quit_text.get_rect(center=quit_button.center) 
-        display_surface.blit(quit_text, quit_text_rect)
-        
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -161,9 +95,11 @@ class Level:
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
-                    if quit_button.collidepoint(mouse_pos):
-                        pygame.quit()
-                        sys.exit()
+                    for i, button in enumerate(buttons):
+                        if button.collidepoint(mouse_pos):
+                            if GAMEOVER_OPTIONS[i] == 'Quit Game':
+                                pygame.quit()
+                                sys.exit()
             pygame.display.flip()
 
     def run(self):
@@ -172,7 +108,6 @@ class Level:
         self.visible_sprites.enemy_update(self.player)
         self.heartbeat.update(self.player, self.enemy)
         self.heartbeat.draw(self.display_surface)
-
         for enemy in self.enemies:
             distance = ((self.player.rect.x - enemy.rect.x)**2 + (self.player.rect.y - enemy.rect.y)**2)**0.5
 
@@ -196,7 +131,8 @@ class Level:
                 self.stats.pathfinding_length += math.sqrt((self.enemy.rect.x - self.previous_enemy_position[0])**2 + (self.enemy.rect.y - self.previous_enemy_position[1])**2)
                 self.previous_enemy_position = self.enemy.rect.topleft
                 self.stats.total_enemy_distance_travelled_sprint = self.enemy.total_distance_while_player_sprints
-                self.stats_screenPlayer(self.display_surface)
+                self.send_data_to_server()
+                self.game_over_screen(self.display_surface)
                 return
             elif distance > enemy.chase_radius:  
                 if self.in_chase_radius: 
@@ -228,6 +164,26 @@ class Level:
             self.stats.pathfinding_length += math.sqrt((self.enemy.rect.x - self.previous_enemy_position[0])**2 + (self.enemy.rect.y - self.previous_enemy_position[1])**2)
             self.previous_enemy_position = self.enemy.rect.topleft
             self.stats.total_enemy_distance_travelled_sprint = self.enemy.total_distance_while_player_sprints
-            self.stats_screenPlayer(self.display_surface)
+            self.send_data_to_server()
+            self.game_over_screen(self.display_surface)
             return
+
+    def send_data_to_server(self):
+        game_data = {
+            "timePlayed" : self.stats.time_played,
+            "died": self.stats.died,
+            "won": self.stats.won,
+            "amountPaused": self.stats.amount_paused,
+            "escapedChases": self.stats.chases_escaped,
+            "combinedChaseTime": self.stats.chase_times,
+            "averageHeartbeat": self.stats.avg_heartbeat,
+            "mostOftenHeartbeat": self.stats.most_often_mood,
+            "rarestHeartbeat": self.stats.rarest_mood,
+            "totalDistanceTraveled": f"{round(self.stats.total_distance_travelled, 2)} pixels",
+            "staminaUsed": self.stats.stamina_used,
+        }
+
+        response = requests.post(self.url, json = game_data)
+        print(game_data)
+        print(response.text)
             

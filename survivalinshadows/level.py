@@ -12,6 +12,12 @@ from heartbeat import Heartbeat
 from tile import Tile
 from player import Player
 
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+DARK_RED = (139, 0, 0)  
+GHOST_WHITE = (248, 248, 255)  
+
+
 class Level:
     url = "https://survivalinshadowsbackend.onrender.com/game-data"
 
@@ -79,12 +85,25 @@ class Level:
         button_font = pygame.font.Font(None, 50)
         button_width, button_height = 300, 50
 
+        if self.stats.died:
+            message_text = "Game Over"
+            message_color = DARK_RED
+        else:
+            message_text = "Victory!"
+            message_color = GHOST_WHITE
+
+        message_font = pygame.font.Font(None, 100)  
+        message_surface = message_font.render(message_text, True, message_color)
+        message_rect = message_surface.get_rect(center=(screen_width / 2, screen_height / 2))
+
+        display_surface.blit(message_surface, message_rect)
+
         buttons = []
         for i, option in enumerate(GAMEOVER_OPTIONS):
-            button = pygame.Rect(screen_width / 2 - button_width / 2, screen_height / 2 - button_height - 10 + i * (button_height + 20), button_width, button_height)
-            pygame.draw.rect(display_surface, (255, 255, 255), button)  
-            text = button_font.render(option, True, (0, 0, 0))  
-            text_rect = text.get_rect(center=button.center)  
+            button = pygame.Rect(screen_width / 2 - button_width / 2, screen_height / 2 + 150 + i * (button_height + 20), button_width, button_height)  # Adjust position below the message
+            pygame.draw.rect(display_surface, (255, 255, 255), button)
+            text = button_font.render(option, True, (0, 0, 0))
+            text_rect = text.get_rect(center=button.center)
             display_surface.blit(text, text_rect)
             buttons.append(button)
 

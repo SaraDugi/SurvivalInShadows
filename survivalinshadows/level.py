@@ -20,7 +20,7 @@ GHOST_WHITE = (248, 248, 255)
 
 class Level:
     url = "https://survivalinshadowsbackend.onrender.com/game-data"
-
+    
     def __init__(self, mission_name):
         self.display_surface = pygame.display.get_surface()
         self.visible_sprites = YSortCameraGroup()
@@ -131,6 +131,7 @@ class Level:
             distance = ((self.player.rect.x - enemy.rect.x)**2 + (self.player.rect.y - enemy.rect.y)**2)**0.5
 
             if pygame.sprite.collide_rect(self.player, enemy):
+                print("YES")
                 if self.in_chase_radius: 
                     self.number_chases += 1  
                     self.total_chase_time += pygame.time.get_ticks() - self.chase_start_time
@@ -189,17 +190,26 @@ class Level:
 
     def send_data_to_server(self):
         game_data = {
+            # Player stats
             "timePlayed" : self.stats.time_played,
             "died": self.stats.died,
             "won": self.stats.won,
             "amountPaused": self.stats.amount_paused,
+            "encounters": self.stats.encounters,
             "escapedChases": self.stats.chases_escaped,
-            "combinedChaseTime": self.stats.chase_times,
             "averageHeartbeat": self.stats.avg_heartbeat,
             "mostOftenHeartbeat": self.stats.most_often_mood,
             "rarestHeartbeat": self.stats.rarest_mood,
             "totalDistanceTraveled": f"{round(self.stats.total_distance_travelled, 2)} pixels",
             "staminaUsed": self.stats.stamina_used,
+            "playerDistanceSprinted": self.stats.player_distance_sprinted,
+
+            # Enemy stats
+            "pathFinding": self.stats.pathfinding,
+            "combinedChaseTime": self.stats.chase_times,
+            "pathFindingLength": self.stats.pathfinding_length,
+            "totalEnemyDistanceTravelledSprint": self.stats.total_enemy_distance_travelled_sprint,
+            "nodesExplored": self.nodes_explored
         }
 
         response = requests.post(self.url, json = game_data)

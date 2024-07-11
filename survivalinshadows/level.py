@@ -131,7 +131,6 @@ class Level:
             distance = ((self.player.rect.x - enemy.rect.x)**2 + (self.player.rect.y - enemy.rect.y)**2)**0.5
 
             if pygame.sprite.collide_rect(self.player, enemy):
-                print("YES")
                 if self.in_chase_radius: 
                     self.number_chases += 1  
                     self.total_chase_time += pygame.time.get_ticks() - self.chase_start_time

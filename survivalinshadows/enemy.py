@@ -46,7 +46,7 @@ class Enemy(Entity):
             self.status = 'walk'
             self.speed = 3
 
-    def enemy_move(self, player):
+    def enemy_move(self, player, game_stats):
         maze = read_csv_file('Graphics/Map/CSV/abandonefactory_limit.csv')  
         start = (int(self.rect.x//TILESIZE), int(self.rect.y//TILESIZE))
         end = (int(player.rect.x//TILESIZE), int(player.rect.y//TILESIZE))
@@ -68,6 +68,7 @@ class Enemy(Entity):
                 next_step[0] *= TILESIZE
                 next_step[1] *= TILESIZE
                 self.direction = pygame.math.Vector2(next_step[0] - self.rect.x, next_step[1] - self.rect.y)
+                game_stats.nodes_explored += 1
         
         if path != None or self.rect.x % TILESIZE != 0 or self.rect.y % TILESIZE != 0:
             self.move(3)            
@@ -105,9 +106,9 @@ class Enemy(Entity):
         self.image = animation[int(self.frame_index)]
         self.rect = self.image.get_rect(center = self.hit_box.center)
 
-    def enemy_update(self,player):
+    def enemy_update(self,player, game_stats):
         self.get_status(player)
-        self.enemy_move(player) 
+        self.enemy_move(player, game_stats) 
         self.animate()
         if player.speed_boost_active:
             self.total_distance_while_player_sprints += math.sqrt((self.rect.x - self.previous_enemy_position[0])**2 + (self.rect.y - self.previous_enemy_position[1])**2)

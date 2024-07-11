@@ -124,7 +124,7 @@ class Level:
     def run(self):
         self.visible_sprites.custom_draw(self.player)
         self.visible_sprites.update()
-        self.visible_sprites.enemy_update(self.player)
+        self.visible_sprites.enemy_update(self.player, self.stats)
         self.heartbeat.update(self.player, self.enemy)
         self.heartbeat.draw(self.display_surface)
         for enemy in self.enemies:
@@ -208,7 +208,7 @@ class Level:
             "combinedChaseTime": self.stats.chase_times,
             "pathFindingLength": self.stats.pathfinding_length,
             "totalEnemyDistanceTravelledSprint": self.stats.total_enemy_distance_travelled_sprint,
-            "nodesExplored": self.nodes_explored
+            "nodesExplored": self.stats.nodes_explored
         }
 
         response = requests.post(self.url, json = game_data)

@@ -16,13 +16,12 @@ class Player(Entity):
 		self.import_player_assets()
 		self.status = 'down'
 		self.obstacle_sprites = obstacle_sprites
-		self.stats = {'health' : 250, 'stamina' : 3, 'speed' : 0.75}
+		self.stats = {'health' : 250, 'stamina' : 3, 'speed' : 3.00}
 		self.health = self.stats['health']
 		self.energy = self.stats['stamina']
 		self.speed = self.stats['speed']
 		self.health_bar = pygame.Rect(10, 10, self.health, 25) 
-		self.stamina_counter = self.energy
-		self.last_stamina_reduction = pygame.time.get_ticks() 
+		self.stamina_counter = self.energy 
 		self.speed_boost_active = False  
 		self.last_speed_boost = 0 
 		self.start_ticks = pygame.time.get_ticks()  
@@ -66,14 +65,11 @@ class Player(Entity):
 
 		if keys[pygame.K_TAB] and self.stamina_counter > 0 and not self.speed_boost_active:  		
 			current_time = pygame.time.get_ticks()
-			if current_time - STAMINA_COOLDOWN >= STAMINA_COOLDOWN: 
+			if current_time - self.last_speed_boost >= STAMINA_COOLDOWN: 
 				self.last_speed_boost = current_time 
-				self.stamina_counter -= 1 
-				self.last_stamina_reduction = current_time  
+				self.stamina_counter -= 1   
 				self.speed_boost_active = True  
-				self.last_speed_boost = current_time  
 				self.used_stamina  += 1
-				self.speed *= 2  
 
 	
 	def get_status(self):
@@ -131,7 +127,6 @@ class Player(Entity):
 		self.input()
 		self.get_status()
 		self.animate()
-		self.move(self.speed)
 		self.draw_stamina_items(pygame.display.get_surface())
 		self.draw_timer(pygame.display.get_surface())
 			 
@@ -140,4 +135,4 @@ class Player(Entity):
 			self.move(self.speed * 2)  
 		else:
 			self.speed_boost_active = False  
-			self.move(2)
+			self.move(self.speed)

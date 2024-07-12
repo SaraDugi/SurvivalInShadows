@@ -87,6 +87,7 @@ class PauseMenu(Menu):
         return True
 
 def load_game(mission_name):
+    is_torch_effect = True
     level = Level(mission_name) 
     clock = pygame.time.Clock()
     pause_menu = PauseMenu('Paused', ['Resume', 'Quit Game'], mission_name, level)
@@ -96,15 +97,15 @@ def load_game(mission_name):
     game_music.set_volume(0.4)
 
     if mission_name == 'Mission 1':
-            level.enemy.enemy_type = 'a*'
+        level.enemy.enemy_type = 'a*'
     elif mission_name == 'Mission 2':
-            level.enemy.enemy_type = 'd'
+        level.enemy.enemy_type = 'd'
     elif mission_name == 'Mission 3':
-            level.enemy.enemy_type = 'bfs'
+        level.enemy.enemy_type = 'bfs'
     elif mission_name == 'Mission 4':
-            level.enemy.enemy_type = 'g'
+        level.enemy.enemy_type = 'g'
     elif mission_name == 'Mission 5':
-            level.enemy.enemy_type = 'bd'
+        level.enemy.enemy_type = 'bd'
 
     running = True
     while running:
@@ -115,6 +116,9 @@ def load_game(mission_name):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     paused = not paused
+                '''elif event.key == pygame.K_t:
+                    is_torch_effect = True'''
+
                 if paused:
                     paused = pause_menu.handle_event(event, level)
         if paused:
@@ -122,7 +126,7 @@ def load_game(mission_name):
                 return
             pause_menu.render()
         else:
-            level.run()  
+            level.run(is_torch_effect)  
             pygame.display.flip() 
             clock.tick(60)
         

@@ -42,3 +42,7 @@ GAMEOVER_OPTIONS = ['Quit Game']
 monster_data =  {
     '1': {'speed':3, 'damage': 100, 'chase_radius': 5000, 'notice_radius': 100}
 }
+
+TORCH_EFFECT_IMAGE = "Graphics/Misc/torch_effect.png"
+TORCH_RADIUS = (300, 300)
+NIGHT_COLOR = (10, 10, 10)

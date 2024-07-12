@@ -1,4 +1,5 @@
 import pygame
+from settings import *
 
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self):
@@ -10,8 +11,12 @@ class YSortCameraGroup(pygame.sprite.Group):
 
         self.floor = pygame.image.load("Graphics/Map/map/abandonefactory.png").convert()
         self.floor_rect = self.floor.get_rect(topleft=(0, 0))
+        self.night = pygame.Surface((WIDTH, HEIGHT))
+        self.torch_mask = pygame.image.load(TORCH_EFFECT_IMAGE).convert_alpha()
+        self.torch_mask = pygame.transform.scale(self.torch_mask, TORCH_RADIUS)
+        self.torch_mask_rect = self.torch_mask.get_rect()
 
-    def custom_draw(self, player):
+    def custom_draw(self, player, is_torch_effect):
         self.offset.x = player.rect.centerx - self.half_width
         self.offset.y = player.rect.centery - self.half_height
 
@@ -23,6 +28,13 @@ class YSortCameraGroup(pygame.sprite.Group):
             if sprite == player:
                 offset_pos = (self.half_width - player.rect.width // 2, self.half_height - player.rect.height // 2)
             self.display_surface.blit(sprite.image, offset_pos)
+        
+        if is_torch_effect:
+            self.night.fill(NIGHT_COLOR)
+            self.torch_mask_rect.center = player.rect.center
+            offset_pos = (self.half_width - self.torch_mask_rect.width // 2, self.half_height - self.torch_mask_rect.height // 2)
+            self.night.blit(self.torch_mask, offset_pos)
+            self.display_surface.blit(self.night, (0, 0), special_flags=pygame.BLEND_MULT)
 
     def enemy_update(self, player, game_stats):
         enemy_sprites = [sprite for sprite in self.sprites() if hasattr(sprite,'sprite_type') and sprite.sprite_type == 'enemy']

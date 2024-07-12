@@ -121,8 +121,8 @@ class Level:
                                 sys.exit()
             pygame.display.flip()
 
-    def run(self):
-        self.visible_sprites.custom_draw(self.player)
+    def run(self, is_torch_effect):
+        self.visible_sprites.custom_draw(self.player, is_torch_effect)
         self.visible_sprites.update()
         self.visible_sprites.enemy_update(self.player, self.stats)
         self.heartbeat.update(self.player, self.enemy)

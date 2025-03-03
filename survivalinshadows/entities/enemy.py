@@ -1,7 +1,8 @@
 import pygame
-from settings import *
-from entity import *
-from csvimport import *
+import math
+from misc.settings import *
+from entities.entity import *
+from misc.csvimport import *
 from pathfinding.astar import  astar_pathfinding
 from pathfinding.bfs import bfs_pathfinding
 from pathfinding.dijsktra import dijkstra_pathfinding
@@ -109,6 +110,4 @@ class Enemy(Entity):
         self.get_status(player)
         self.enemy_move(player) 
         self.animate()
-        if player.speed_boost_active:
-            self.total_distance_while_player_sprints += math.sqrt((self.rect.x - self.previous_enemy_position[0])**2 + (self.rect.y - self.previous_enemy_position[1])**2)
         self.previous_enemy_position = self.rect.topleft

@@ -29,13 +29,15 @@ WHITE = (255, 255, 255)
 FONT_SIZE = 55
 GREEN = (0, 255, 0)
 RED = (255, 0, 0)
+DARK_RED = (139, 0, 0)  
+GHOST_WHITE = (248, 248, 255)  
 
 STAMINA_REDUCTION = 10  
 STAMINA_COOLDOWN = 1000  
 SPEED_BOOST_DURATION = 5000
 
 MAIN_OPTIONS = ['Start Game', 'Exit Game']
-MISSION_OPTIONS = ['Mission 1', 'Mission 2', 'Mission 3', 'Mission 4', 'Mission 5']
+MISSION_OPTIONS = ['Mission 1']
 PAUSE_OPTIONS = ['Resume', 'Quit to start menu', 'Quit the game']
 GAMEOVER_OPTIONS = ['Quit Game']
 

@@ -1,6 +1,6 @@
 import pygame
-from settings import *
-from level import *
+from misc.settings import *
+from levels.level import *
 
 class Entity(pygame.sprite.Sprite):
     def __init__(self, groups):

@@ -1,5 +1,5 @@
 import pygame
-from settings import *
+from misc.settings import *
 
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self):

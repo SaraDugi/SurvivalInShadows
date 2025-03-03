@@ -10,11 +10,12 @@ from menus.gameovermenu import GameOverScreen
 from mechanisms.torch import TorchEffect  
 
 class Level:    
-    def __init__(self, mission_name):
+    def __init__(self, mission_name, settings_manager):
         self.display_surface = pygame.display.get_surface()
         self.visible_sprites = YSortCameraGroup()
         self.obstacle_sprites = pygame.sprite.Group()
         self.mission_name = mission_name
+        self.settings_manager = settings_manager
 
         self.create_map(mission_name)
 
@@ -44,7 +45,7 @@ class Level:
                                 self.player = Player((x, y), [self.visible_sprites], self.obstacle_sprites)
                         elif style == 'enemy':
                             if col == '0':
-                                None
+                                None 
 
     def run(self, is_torch_effect):
         self.visible_sprites.custom_draw(self.player, is_torch_effect)

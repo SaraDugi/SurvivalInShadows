@@ -38,7 +38,7 @@ SPEED_BOOST_DURATION = 5000
 
 MAIN_OPTIONS = ['Start Game', 'Exit Game']
 MISSION_OPTIONS = ['Mission 1']
-PAUSE_OPTIONS = ['Resume', 'Quit to start menu', 'Quit the game']
+PAUSE_OPTIONS = ['Resume', 'Settings']
 GAMEOVER_OPTIONS = ['Quit Game']
 
 monster_data =  {

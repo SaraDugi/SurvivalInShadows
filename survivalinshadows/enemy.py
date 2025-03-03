@@ -2,11 +2,11 @@ import pygame
 from settings import *
 from entity import *
 from csvimport import *
-from pathfidning_astar import  astar_pathfinding
-from pathfidning_bfs import bfs_pathfinding
-from pathfinding_dijsktra import dijkstra_pathfinding
-from pathfidning_greedy import greedy_pathfinding
-from pathfidning_bidirectional import bidirectional_pathfinding
+from survivalinshadows.pathfinding.astar import  astar_pathfinding
+from survivalinshadows.pathfinding.bfs import bfs_pathfinding
+from survivalinshadows.pathfinding.dijsktra import dijkstra_pathfinding
+from survivalinshadows.pathfinding.greedy import greedy_pathfinding
+from survivalinshadows.pathfinding.bidirectional import bidirectional_pathfinding
 
 class Enemy(Entity):
     def __init__(self,enemy_type,name, pos, groups, obstacle_sprites):

@@ -12,11 +12,6 @@ class StaminaPotion(Item):
         self.obstacle_sprites = obstacle_sprites
 
     def update(self, player):
-        """
-        Checks for collision with the player.
-        If the player's stamina is not full, the potion restores one charge and is consumed.
-        Otherwise, the potion is not used.
-        """
         if self.rect.colliderect(player.rect):
             if player.stamina.stamina_counter < player.stamina.max_stamina:
                 player.stamina.restore_stamina(1)

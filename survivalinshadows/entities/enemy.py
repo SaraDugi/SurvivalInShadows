@@ -1,5 +1,4 @@
 import pygame
-import math
 from misc.settings import *
 from entities.entity import *
 from misc.csvimport import *
@@ -73,13 +72,13 @@ class Enemy(Entity):
             elif self.enemy_type == 'bd':
                 path = bidirectional_pathfinding(maze, start, end, MAX_STEPS)
             
-            if path is not None and len(path) > 1:  # Ensure path has at least 2 elements
+            if path is not None and len(path) > 1:
                 next_step = list(path[1])
                 next_step[0] *= TILESIZE
                 next_step[1] *= TILESIZE
                 self.direction = pygame.math.Vector2(next_step[0] - self.rect.x, next_step[1] - self.rect.y)
             else:
-                self.direction = pygame.math.Vector2(0, 0)  # Stop moving if no valid path
+                self.direction = pygame.math.Vector2(0, 0)
 
     def get_player_distance_direction(self, player):
         enemy_vec = pygame.math.Vector2(self.rect.center)
@@ -112,10 +111,10 @@ class Enemy(Entity):
 
     def enemy_update(self, player):
         self.get_status(player)
-        if not pygame.sprite.collide_rect(self, player):  # Move only if not colliding
+        if not pygame.sprite.collide_rect(self, player):
             self.enemy_move(player)
         self.animate()
 
         if pygame.sprite.collide_rect(self, player):
             self.attack(player)
-            self.direction = pygame.math.Vector2(0, 0)  # Stop enemy movement
+            self.direction = pygame.math.Vector2(0, 0)

@@ -13,8 +13,10 @@ class StaminaPotion(Item):
 
     def update(self, player):
         if self.rect.colliderect(player.rect):
+            # Only pick up if player's stamina is not full.
             if player.stamina.stamina_counter < player.stamina.max_stamina:
-                player.stamina.restore_stamina(1)
+                player.inventory.add_item(self)
+                print("Stamina Potion picked up!")
                 self.kill()
             else:
-                print("Stamina is full. Potion cannot be used.")
+                print("Stamina is full. Potion cannot be picked up.")

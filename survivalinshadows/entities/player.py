@@ -5,6 +5,7 @@ from entities.entity import Entity
 from mechanisms.timer import Timer
 from mechanisms.stamina import Stamina
 from mechanisms.healthbar import HealthBar
+from mechanisms.inventory import Inventory
 
 class Player(Entity):
     def __init__(self, pos, groups, obstacle_sprites):
@@ -25,6 +26,7 @@ class Player(Entity):
         self.invincible = False
         self.last_hit_time = 0
         self.invincibility_duration = 1000
+        self.inventory = Inventory()
 
     def import_player_assets(self):
         self.animations = {
@@ -52,7 +54,6 @@ class Player(Entity):
 
     def input(self):
         keys = pygame.key.get_pressed()
-        # Reset movement directions.
         self.direction.x = 0
         self.direction.y = 0
 
@@ -71,6 +72,10 @@ class Player(Entity):
 
         if keys[pygame.K_TAB]:
             self.stamina.use_stamina()
+
+        # Toggle inventory with I key.
+        if keys[pygame.K_i]:
+            self.inventory.toggle_inventory()
 
     def get_status(self):
         if self.direction.x == 0 and self.direction.y == 0:
@@ -96,11 +101,12 @@ class Player(Entity):
             self.invincible = False
 
         if self.stamina.speed_boost_active:
-            self.move(self.speed * 2)  
+            self.move(self.speed * 2)
         else:
             self.move(self.speed)
 
-    def draw_ui(self, screen):
+    def draw_ui(self, screen, font):
         self.health_bar.draw(screen)
         self.stamina.draw_stamina_items(screen)
         self.timer.draw_timer(screen)
+        self.inventory.render_inventory_screen(screen, font)

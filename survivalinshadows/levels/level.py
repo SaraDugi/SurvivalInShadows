@@ -54,8 +54,7 @@ class Level:
         potion_y = self.player.rect.y
 
         stamina_potion = StaminaPotion((potion_x, potion_y), [self.visible_sprites, self.item_sprites], self.obstacle_sprites)
-        health_potion = HealthPotion((potion_x + TILESIZE, potion_y), [self.visible_sprites, self.item_sprites], self.obstacle_sprites)  # ✅ Offset to the right
-
+        health_potion = HealthPotion((potion_x + TILESIZE, potion_y), [self.visible_sprites, self.item_sprites], self.obstacle_sprites)
         self.item_sprites.add(stamina_potion, health_potion)
 
     def run(self, is_torch_effect):
@@ -70,7 +69,8 @@ class Level:
         self.heartbeat.update(self.player, self.enemy)
         self.heartbeat.draw(self.display_surface)
 
-        self.player.draw_ui(self.display_surface)
+        font = pygame.font.SysFont(None, FONT_SIZE)
+        self.player.draw_ui(self.display_surface, font)
 
         if is_torch_effect:
             self.torch_effect.draw_light_mask(self.display_surface, self.player)

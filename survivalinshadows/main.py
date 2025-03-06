@@ -1,7 +1,7 @@
 import pygame
 import sys
 from levels.level import Level
-from misc.settings import *
+from misc.settings import FONT_SIZE, PAUSE_OPTIONS, MAIN_OPTIONS, MISSION_OPTIONS
 from misc.settingsmanager import SettingsManager
 from menus.menu import Menu
 from menus.pausemenu import PauseMenu
@@ -26,7 +26,6 @@ background = pygame.transform.scale(background, (screen_width, screen_height))
 
 start_menu_music = pygame.mixer.Sound("Graphics/Audio/bg_audio/2. Moonless Night.wav")
 game_music = pygame.mixer.Sound("Graphics/Audio/bg_audio/6. Lurking in the Dark.wav")
-
 pygame.mixer.music.set_volume(settings_manager.get_setting("volume"))
 
 
@@ -52,7 +51,6 @@ def load_game(mission_name, start_menu):
         pause_menu = PauseMenu("Paused", PAUSE_OPTIONS + ["Quit to Title", "Retry"],
                                level, screen, font, settings_manager, return_to_main, restart_level)
         paused = False
-
         start_menu_music.stop()
         game_music.play(-1)
         game_music.set_volume(settings_manager.get_setting("volume"))
@@ -80,7 +78,6 @@ def load_game(mission_name, start_menu):
 
 
 def main():
-    global current_menu
     running = True
 
     start_menu = Menu("Survival in Shadows", MAIN_OPTIONS + ["Quit Game"], screen, font)
@@ -99,13 +96,12 @@ def main():
                     if current_menu == start_menu:
                         if current_menu.selected_option == 0:
                             current_menu = mission_menu
-                        elif current_menu.selected_option == len(start_menu.options) - 1:  
+                        elif current_menu.selected_option == len(start_menu.options) - 1:
                             pygame.quit()
                             sys.exit()
                     elif current_menu == mission_menu:
                         mission_name = f"Mission {current_menu.selected_option + 1}"
                         print(f"{mission_name} selected!")
-
                         start_screen = StartScreen(
                             "Survive for the longest you can!",
                             [
@@ -127,13 +123,13 @@ def main():
                             event2 = pygame.event.wait()
                             show_start = start_screen.handle_event(event2)
                             start_screen.render()
-
                         load_game(mission_name, start_menu)
                         current_menu = start_menu
                 else:
                     current_menu.handle_event(event)
 
         current_menu.render()
+        pygame.display.flip()
 
     pygame.quit()
     sys.exit()

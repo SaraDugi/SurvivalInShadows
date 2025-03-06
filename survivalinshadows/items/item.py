@@ -1,6 +1,5 @@
 import pygame
 from misc.settings import *
-from levels.level import *
 
 class Item(pygame.sprite.Sprite):
     def __init__(self, groups):

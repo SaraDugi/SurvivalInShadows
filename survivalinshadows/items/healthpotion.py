@@ -1,6 +1,5 @@
 import pygame
 from misc.settings import *
-from misc.csvimport import import_folder
 from .item import Item
 
 class HealthPotion(Item):
@@ -14,11 +13,10 @@ class HealthPotion(Item):
 
     def update(self, player):
         if self.rect.colliderect(player.rect):
-            # Check if the player's health is full.
-            if player.health == player.stats['health']:
-                print("Health is already full. Potion not used.")
-            else:
-                # Heal the player to full health.
-                player.health = player.stats['health']
-                print("Health fully restored!")
+            # Only pick up if player's health is not full.
+            if player.health < player.stats['health']:
+                player.inventory.add_item(self)
+                print("Health Potion picked up!")
                 self.kill()
+            else:
+                print("Health is already full. Potion cannot be picked up.")

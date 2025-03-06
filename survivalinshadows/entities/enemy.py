@@ -3,37 +3,37 @@ import math
 from misc.settings import *
 from entities.entity import *
 from misc.csvimport import *
-from pathfinding.astar import  astar_pathfinding
+from pathfinding.astar import astar_pathfinding
 from pathfinding.bfs import bfs_pathfinding
 from pathfinding.dijsktra import dijkstra_pathfinding
 from pathfinding.greedy import greedy_pathfinding
 from pathfinding.bidirectional import bidirectional_pathfinding
 
 class Enemy(Entity):
-    def __init__(self,enemy_type,name, pos, groups, obstacle_sprites):
+    def __init__(self, enemy_type, name, pos, groups, obstacle_sprites):
         super().__init__(groups)
         self.sprite_type = 'enemy'
         self.enemy_type = enemy_type
         self.import_graphics(name)
         self.status = 'walk'
         self.image = self.animations[self.status][self.frame_index]
-        self.rect = self.image.get_rect(topleft = pos)
-        self.rect = self.image.get_rect(topleft = pos)
+        self.rect = self.image.get_rect(topleft=pos)
         self.hit_box = self.rect.inflate(0, 0)
         self.obstacle_sprites = obstacle_sprites
         self.frame_index = 0 
         self.monster_name = name
+
         monster_info = monster_data[self.monster_name]
         self.speed = monster_info['speed']
-        self.attack_damage = monster_info['damage']
+        self.attack_damage = None 
         self.chase_radius = monster_info['chase_radius']
         self.notice_radius = monster_info['notice_radius']
-        self.next = None
-        self.total_distance_while_player_sprints = 0
-        self.total_nodes_visited = 0
+        
+        self.attack_cooldown = 1000
+        self.last_attack_time = 0
 
-    def import_graphics(self,name):
-        self.animations = {'walk' : [], 'chase': []}
+    def import_graphics(self, name):
+        self.animations = {'walk': [], 'chase': []}
         main_path = f'Graphics/Enemy_models/{name}/'
         for animation in self.animations.keys():
             self.animations[animation] = import_folder(main_path + animation)
@@ -47,11 +47,20 @@ class Enemy(Entity):
             self.status = 'walk'
             self.speed = 3
 
+    def attack(self, player):
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_attack_time > self.attack_cooldown:
+            if not player.invincible:  
+                damage = player.stats['health'] * 0.1
+                player.take_damage(damage)
+                self.last_attack_time = current_time  
+
     def enemy_move(self, player):
         maze = read_csv_file('Graphics/Map/CSV/abandonefactory_limit.csv')  
-        start = (int(self.rect.x//TILESIZE), int(self.rect.y//TILESIZE))
-        end = (int(player.rect.x//TILESIZE), int(player.rect.y//TILESIZE))
+        start = (int(self.rect.x // TILESIZE), int(self.rect.y // TILESIZE))
+        end = (int(player.rect.x // TILESIZE), int(player.rect.y // TILESIZE))
         path = None
+
         if self.rect.x % TILESIZE == 0 and self.rect.y % TILESIZE == 0:
             if self.enemy_type == 'a*':
                 path = astar_pathfinding(maze, start, end, MAX_STEPS) 
@@ -64,16 +73,15 @@ class Enemy(Entity):
             elif self.enemy_type == 'bd':
                 path = bidirectional_pathfinding(maze, start, end, MAX_STEPS)
             
-            if path is not None and len(path) > 0:
+            if path is not None and len(path) > 1:  # Ensure path has at least 2 elements
                 next_step = list(path[1])
                 next_step[0] *= TILESIZE
                 next_step[1] *= TILESIZE
                 self.direction = pygame.math.Vector2(next_step[0] - self.rect.x, next_step[1] - self.rect.y)
-        
-        if path != None or self.rect.x % TILESIZE != 0 or self.rect.y % TILESIZE != 0:
-            self.move(3)            
+            else:
+                self.direction = pygame.math.Vector2(0, 0)  # Stop moving if no valid path
 
-    def get_player_distance_direction(self,player):
+    def get_player_distance_direction(self, player):
         enemy_vec = pygame.math.Vector2(self.rect.center)
         player_vec = pygame.math.Vector2(player.rect.center)
         distance = (player_vec - enemy_vec).magnitude()
@@ -82,13 +90,9 @@ class Enemy(Entity):
             direction = (player_vec - enemy_vec).normalize()
         else:
             direction = pygame.math.Vector2()
-        return (distance,direction)
-    
-    def explore(self, maze, start, end, max_steps):
-        path, nodes_visited = astar_pathfinding(maze, start, end, max_steps)
-        self.nodes_explored += nodes_visited
+        return (distance, direction)
 
-    def actions(self,player):
+    def actions(self, player):
         if self.status == 'walk':
             self.direction = self.get_player_distance_direction(player)[1]
         else:
@@ -104,10 +108,14 @@ class Enemy(Entity):
             self.frame_index = 0
 
         self.image = animation[int(self.frame_index)]
-        self.rect = self.image.get_rect(center = self.hit_box.center)
+        self.rect = self.image.get_rect(center=self.hit_box.center)
 
-    def enemy_update(self,player):
+    def enemy_update(self, player):
         self.get_status(player)
-        self.enemy_move(player) 
+        if not pygame.sprite.collide_rect(self, player):  # Move only if not colliding
+            self.enemy_move(player)
         self.animate()
-        self.previous_enemy_position = self.rect.topleft
+
+        if pygame.sprite.collide_rect(self, player):
+            self.attack(player)
+            self.direction = pygame.math.Vector2(0, 0)  # Stop enemy movement

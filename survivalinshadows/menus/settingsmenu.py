@@ -1,6 +1,5 @@
 import sys
 import pygame
-import json
 from misc.settings import *
 
 class SettingsMenu:
